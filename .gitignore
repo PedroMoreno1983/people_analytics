@@ -33,3 +33,7 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 
+
+# local temp
+.tmp/
+

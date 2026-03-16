@@ -46,26 +46,39 @@ This path starts PostgreSQL, applies the Prisma schema, seeds the synthetic demo
 
 ### Option 2: Local app + your own PostgreSQL
 
-1. Copy `.env.example` to `.env`.
-2. Point `DATABASE_URL` to your PostgreSQL instance.
+1. Copy `.env.example` to `.env.local`.
+2. Point `DATABASE_URL` and `DIRECT_URL` to your PostgreSQL instance.
 3. Run:
 
 ```bash
 npm install
-npm run db:migrate:dev
+npm run db:migrate:deploy
 npm run db:seed
 npm run dev
 ```
 
 ## Setup
 
-1. Copy `.env.example` to `.env`.
-2. Update `DATABASE_URL` for your PostgreSQL instance.
+1. Copy `.env.example` to `.env.local` for local development.
+2. Update `DATABASE_URL` and `DIRECT_URL` for your PostgreSQL instance.
 3. Install dependencies with `npm install`.
 4. Run `npm run db:generate`.
-5. Run `npm run db:migrate:dev`.
+5. Run `npm run db:migrate:deploy`.
 6. Run `npm run db:seed`.
 7. Run `npm run dev`.
+
+## Local With Supabase
+
+For local development with Supabase:
+
+1. Copy `.env.example` to `.env.local`.
+2. Set `DATABASE_URL` to the Supabase `Transaction pooler` connection string.
+3. Set `DIRECT_URL` to the Supabase `Direct connection` string, or the `Session pooler` on port `5432`.
+4. Run `npm run db:migrate:deploy`.
+5. Run `npm run db:seed`.
+6. Run `npm run dev:share`.
+
+`.env.demo` is only for the Docker demo stack.
 
 ## Routes
 

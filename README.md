@@ -102,7 +102,7 @@ This repo is also prepared for Vercel.
 
 - `vercel.json` defines the install and build commands.
 - `npm run vercel-build` runs `prisma generate`, `prisma migrate deploy` and then `next build`.
-- Vercel must use an external PostgreSQL database.
+- Vercel should use Supabase Postgres with a pooled `DATABASE_URL` and a direct `DIRECT_URL`.
 - Use `.env.vercel.example` as the environment-variable base.
 
 See `deploy/VERCEL.md` for the full Vercel flow.

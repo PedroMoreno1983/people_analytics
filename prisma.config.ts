@@ -2,9 +2,12 @@ import "dotenv/config";
 
 import { defineConfig } from "prisma/config";
 
-const databaseUrl =
+const runtimeDatabaseUrl =
   process.env.DATABASE_URL ??
   "postgresql://postgres:postgres@localhost:5432/datawise_people_analytics?schema=public";
+
+// Use a direct/session connection for Prisma CLI workflows when available.
+const prismaCliDatabaseUrl = process.env.DIRECT_URL ?? runtimeDatabaseUrl;
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -13,6 +16,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: databaseUrl,
+    url: prismaCliDatabaseUrl,
   },
 });

@@ -29,3 +29,7 @@ pnpm-debug.log*
 .env.demo
 .env.production
 
+
+# typescript
+*.tsbuildinfo
+

@@ -95,3 +95,14 @@ npm run dev
 ## Production
 
 Production deployment files are in `deploy/DEPLOY.md`, `Dockerfile` and `docker-compose.production.yml`. The production stack now runs `prisma migrate deploy` before the app starts, and demo seed data is optional through the `demo-data` compose profile.
+
+## Deploy on Vercel
+
+This repo is also prepared for Vercel.
+
+- `vercel.json` defines the install and build commands.
+- `npm run vercel-build` runs `prisma generate`, `prisma migrate deploy` and then `next build`.
+- Vercel must use an external PostgreSQL database.
+- Use `.env.vercel.example` as the environment-variable base.
+
+See `deploy/VERCEL.md` for the full Vercel flow.

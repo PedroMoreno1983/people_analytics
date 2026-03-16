@@ -6,11 +6,13 @@
     "dev": "next dev",
     "dev:share": "next dev --hostname 0.0.0.0 --port 3001",
     "build": "node --require ./scripts/next-build-worker-threads.js ./node_modules/next/dist/bin/next build",
+    "vercel-build": "npm run db:generate && npm run db:migrate:deploy && npm run build",
     "start": "next start",
     "start:share": "next start --hostname 0.0.0.0 --port 3001",
     "lint": "eslint .",
     "test": "tsx --test src/**/*.test.ts",
     "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate --schema prisma/schema.prisma",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
@@ -21,6 +23,9 @@
     "demo:up": "docker compose --env-file .env.demo -f docker-compose.demo.yml up -d --build",
     "demo:down": "docker compose --env-file .env.demo -f docker-compose.demo.yml down",
     "demo:reset": "docker compose --env-file .env.demo -f docker-compose.demo.yml down -v"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",

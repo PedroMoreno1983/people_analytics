@@ -195,7 +195,7 @@ function KpiCard({
   return (
     <div
       className={cn(
-        "rounded-[30px] border p-5 shadow-[0_22px_60px_-44px_rgba(15,23,42,0.45)]",
+        "rounded-[30px] border p-5 shadow-[0_22px_60px_-44px_rgba(35,58,79,0.2)]",
         accents[tone],
       )}
     >
@@ -308,7 +308,7 @@ function DepartmentRow({
   return (
     <div
       className={cn(
-        "rounded-[30px] border p-5 shadow-[0_18px_48px_-36px_rgba(15,23,42,0.42)]",
+        "overflow-hidden rounded-[30px] border p-5 shadow-[0_18px_48px_-36px_rgba(35,58,79,0.18)]",
         toneSurface[department.tone],
       )}
     >
@@ -436,7 +436,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
 
   return (
     <div className="space-y-8">
-      <section className="overflow-hidden rounded-[38px] border border-[#17314f]/12 bg-[radial-gradient(circle_at_top_left,rgba(35,87,133,0.28),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(92,147,142,0.18),transparent_24%),linear-gradient(135deg,rgba(249,247,242,0.98)_0%,rgba(239,244,247,0.98)_52%,rgba(255,255,255,1)_100%)] p-8 shadow-[0_38px_120px_-54px_rgba(16,33,60,0.72)] lg:p-10">
+      <section className="overflow-hidden rounded-[38px] border border-white/80 bg-[radial-gradient(circle_at_top_left,rgba(86,142,167,0.22),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(92,147,142,0.14),transparent_24%),linear-gradient(135deg,rgba(252,249,244,0.98)_0%,rgba(241,248,250,0.98)_52%,rgba(255,255,255,1)_100%)] p-8 shadow-[0_32px_90px_-52px_rgba(35,58,79,0.24)] lg:p-10">
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
           <div className="min-w-0">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -485,7 +485,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-[28px] border border-white/70 bg-white/72 p-5 backdrop-blur shadow-[0_24px_60px_-44px_rgba(15,23,42,0.6)]"
+                    className="rounded-[28px] border border-white/80 bg-white/84 p-5 backdrop-blur shadow-[0_22px_52px_-40px_rgba(35,58,79,0.18)]"
                 >
                   <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     <item.icon className="size-4" />
@@ -501,14 +501,14 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href={`/people?companyId=${summary.companyId}`}
-                className="inline-flex items-center gap-2 rounded-full border border-[#17314f]/15 bg-[#17314f] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_-24px_rgba(23,49,79,0.8)] transition hover:bg-[#21486f]"
+                className="inline-flex items-center gap-2 rounded-full border border-[#4f8d96]/18 bg-[linear-gradient(135deg,#3b7e87_0%,#4f9197_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_-24px_rgba(55,109,119,0.42)] transition hover:brightness-[1.04]"
               >
                 Abrir alertas de personas
                 <ArrowUpRight className="size-4" />
               </Link>
               <Link
                 href={`/departments?companyId=${summary.companyId}`}
-                className="inline-flex items-center gap-2 rounded-full border border-[#17314f]/14 bg-white/86 px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-white"
+                className="inline-flex items-center gap-2 rounded-full border border-[#18314d]/10 bg-white/88 px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-white"
               >
                 Explorar equipos
                 <ArrowRight className="size-4" />
@@ -517,7 +517,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
           </div>
 
           <div className="grid gap-4">
-            <div className="rounded-[32px] border border-[#17314f]/10 bg-[linear-gradient(180deg,#10213c_0%,#17314f_58%,#1d4465_100%)] p-6 text-white shadow-[0_30px_80px_-42px_rgba(16,33,60,0.88)]">
+            <div className="rounded-[32px] border border-[#4f8d96]/18 bg-[linear-gradient(160deg,#3d7886_0%,#4e9098_52%,#79b1af_100%)] p-6 text-white shadow-[0_28px_70px_-40px_rgba(55,109,119,0.42)]">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">
@@ -551,7 +551,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
               </div>
             </div>
 
-            <div className="rounded-[32px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_26px_80px_-46px_rgba(15,23,42,0.45)]">
+            <div className="rounded-[32px] border border-white/80 bg-white/90 p-6 shadow-[0_24px_60px_-42px_rgba(35,58,79,0.18)]">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">

@@ -37,7 +37,7 @@ function getFileTypeFromName(fileName: string) {
 }
 
 const inputClassName =
-  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400";
+  "w-full min-w-0 rounded-2xl border border-white/80 bg-white/88 px-4 py-3 text-sm text-slate-900 outline-none shadow-[0_16px_36px_-28px_rgba(35,58,79,0.18)] transition focus:border-[#4f8d96]/40";
 const selectClassName = inputClassName;
 
 function formatHistoryTimestamp(value: string) {
@@ -341,9 +341,9 @@ export function IngestionWorkbench() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6">
+        <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_24px_60px_-40px_rgba(35,58,79,0.18)]">
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-slate-950 p-3 text-white">
+            <div className="rounded-2xl bg-[linear-gradient(135deg,#3b7e87_0%,#4f9197_100%)] p-3 text-white shadow-[0_18px_36px_-26px_rgba(55,109,119,0.42)]">
               <UploadCloud className="size-5" />
             </div>
             <div>
@@ -446,9 +446,9 @@ export function IngestionWorkbench() {
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-4">
+            <div className="rounded-[24px] border border-slate-200 bg-[#f5faf9] p-4">
               <div className="flex items-center justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-slate-950">
                     Comportamiento de persistencia
                   </p>
@@ -474,7 +474,7 @@ export function IngestionWorkbench() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6">
+          <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_24px_60px_-40px_rgba(35,58,79,0.18)]">
             <div className="flex items-center gap-3">
               <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-700">
                 <Database className="size-5" />
@@ -493,10 +493,10 @@ export function IngestionWorkbench() {
               {currentDataset.fields.map((field) => (
                 <div
                   key={field.key}
-                  className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4"
+                  className="rounded-[22px] border border-slate-200 bg-slate-50/82 p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-950">
                         {field.label}
                       </p>
@@ -596,7 +596,7 @@ export function IngestionWorkbench() {
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-        <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6">
+        <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_24px_60px_-40px_rgba(35,58,79,0.18)]">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-slate-950">
@@ -613,9 +613,9 @@ export function IngestionWorkbench() {
             {ingestionDatasets.map((item) => (
               <div
                 key={item.key}
-                className="flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-4 lg:flex-row lg:items-center lg:justify-between"
+                className="flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-slate-50/82 p-4 lg:flex-row lg:items-center lg:justify-between"
               >
-                <div>
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-slate-950">{item.label}</p>
                     {item.key === dataset ? <Badge variant="positive">Dataset activo</Badge> : null}
@@ -636,7 +636,7 @@ export function IngestionWorkbench() {
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6">
+        <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_24px_60px_-40px_rgba(35,58,79,0.18)]">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-slate-950">
@@ -664,10 +664,10 @@ export function IngestionWorkbench() {
               historyRuns.map((run) => (
                 <div
                   key={run.id}
-                  className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-4"
+                  className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50/82 p-4"
                 >
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-slate-950">
                           {getDatasetLabel(run.dataset)}
@@ -746,7 +746,7 @@ export function IngestionWorkbench() {
 
       {preview ? (
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6">
+          <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_24px_60px_-40px_rgba(35,58,79,0.18)]">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold text-slate-950">
@@ -759,12 +759,12 @@ export function IngestionWorkbench() {
               <Badge variant="neutral">{preview.dataset}</Badge>
             </div>
 
-            <div className="mt-6 overflow-auto rounded-[24px] border border-slate-200">
+            <div className="mt-6 overflow-auto rounded-[24px] border border-slate-200 bg-white">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
                 <thead className="bg-slate-50 text-left text-slate-500">
                   <tr>
                     {preview.headers.map((header) => (
-                      <th key={header} className="px-4 py-3 font-medium">
+                      <th key={header} className="px-4 py-3 font-medium whitespace-normal">
                         {header}
                       </th>
                     ))}
@@ -774,7 +774,7 @@ export function IngestionWorkbench() {
                   {preview.previewRows.map((row, rowIndex) => (
                     <tr key={rowIndex}>
                       {preview.headers.map((header) => (
-                        <td key={`${rowIndex}-${header}`} className="px-4 py-3 text-slate-600">
+                        <td key={`${rowIndex}-${header}`} className="px-4 py-3 align-top text-slate-600 whitespace-normal break-words">
                           {row[header] || "-"}
                         </td>
                       ))}
@@ -786,7 +786,7 @@ export function IngestionWorkbench() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6">
+            <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_24px_60px_-40px_rgba(35,58,79,0.18)]">
               <h2 className="text-xl font-semibold text-slate-950">
                 Feedback del servidor
               </h2>
@@ -813,7 +813,7 @@ export function IngestionWorkbench() {
             </div>
 
             {issues.length > 0 ? (
-              <div className="rounded-[28px] border border-rose-200 bg-white/90 p-6">
+              <div className="overflow-hidden rounded-[28px] border border-rose-200 bg-white/90 p-6 shadow-[0_24px_60px_-42px_rgba(216,93,104,0.12)]">
                 <h2 className="text-xl font-semibold text-slate-950">
                   Problemas de importacion
                 </h2>

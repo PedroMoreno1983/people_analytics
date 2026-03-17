@@ -12,20 +12,20 @@ export function AppShell({ children }: PropsWithChildren) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#f5f1ea_0%,#eef3f6_45%,#f7fafb_100%)]">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#fbf8f2_0%,#f1f7f8_45%,#f9fbfc_100%)]">
       <div className="mx-auto grid min-h-screen max-w-[1600px] gap-6 px-4 py-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:px-6">
-        <aside className="rounded-[32px] border border-[#17314f]/70 bg-[linear-gradient(180deg,#10213c_0%,#17314f_55%,#1c4465_100%)] px-6 py-8 text-slate-100 shadow-[0_28px_90px_-44px_rgba(16,33,60,0.88)]">
+        <aside className="rounded-[32px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(239,246,248,0.97))] px-6 py-8 text-slate-900 shadow-[0_26px_70px_-42px_rgba(35,58,79,0.26)] backdrop-blur">
           <div className="space-y-6">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/7 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-                <Sparkles className="size-3.5" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#4f8d96]/18 bg-[#ebf5f4] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#376d77]">
+                <Sparkles className="size-3.5 text-[#4f8d96]" />
                 Demo DataWise
               </div>
               <div>
-                <h1 className="font-serif text-3xl font-semibold tracking-tight text-white">
+                <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-950">
                   Analitica de Personas
                 </h1>
-                <p className="mt-3 text-sm leading-6 text-slate-300">
+                <p className="mt-3 text-sm leading-6 text-slate-600">
                   Salud organizacional, alertas individuales, vista por equipo y carga
                   gobernada de datos en un solo espacio de trabajo.
                 </p>
@@ -41,17 +41,17 @@ export function AppShell({ children }: PropsWithChildren) {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "block rounded-3xl border px-4 py-4 transition-colors",
+                      "block rounded-3xl border px-4 py-4 transition-all",
                       active
-                        ? "border-white/18 bg-white/14 text-white"
-                        : "border-white/10 bg-white/6 text-slate-200 hover:bg-white/10"
+                        ? "border-[#4f8d96]/22 bg-[linear-gradient(135deg,#eef7f7_0%,#ffffff_100%)] text-[#18314d] shadow-[0_18px_34px_-28px_rgba(35,58,79,0.28)]"
+                        : "border-transparent bg-white/58 text-slate-700 hover:border-white/80 hover:bg-white/84"
                     )}
                   >
                     <div className="flex items-start gap-3">
                       <item.icon className="mt-0.5 size-4 shrink-0" />
                       <div>
                         <div className="text-sm font-semibold">{item.label}</div>
-                        <div className="mt-1 text-xs leading-5 text-slate-400">
+                        <div className="mt-1 text-xs leading-5 text-slate-500">
                           {item.description}
                         </div>
                       </div>
@@ -61,12 +61,12 @@ export function AppShell({ children }: PropsWithChildren) {
               })}
             </nav>
 
-            <div className="rounded-[28px] border border-white/10 bg-white/7 p-4">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                <Database className="size-3.5" />
+            <div className="rounded-[28px] border border-[#d7e3ea] bg-white/78 p-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <Database className="size-3.5 text-[#4f8d96]" />
                 Alcance actual
               </div>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 <li>Dashboard ejecutivo y cola priorizada de personas sobre Prisma</li>
                 <li>Pipeline analitico con scoring explicable de fuga y burnout</li>
                 <li>Lectura operativa por manager, area y siguiente accion sugerida</li>

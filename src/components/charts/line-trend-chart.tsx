@@ -50,26 +50,28 @@ export function LineTrendChart({
   };
 
   return (
-    <div className="h-64 min-w-0">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240}>
-        <AreaChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
+    <div className="h-72 min-w-0 overflow-hidden rounded-[28px] bg-[radial-gradient(circle_at_top,rgba(91,143,152,0.12),transparent_44%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] px-2 py-4">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={260}>
+        <AreaChart data={data} margin={{ top: 12, right: 16, left: 6, bottom: 12 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={stroke} stopOpacity={0.24} />
-              <stop offset="70%" stopColor={stroke} stopOpacity={0.06} />
+              <stop offset="0%" stopColor={stroke} stopOpacity={0.26} />
+              <stop offset="65%" stopColor={stroke} stopOpacity={0.08} />
               <stop offset="100%" stopColor={stroke} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <CartesianGrid strokeDasharray="4 4" stroke="rgba(189,204,214,0.8)" vertical={false} />
           <XAxis
             dataKey={xKey}
-            stroke="#64748b"
+            stroke="#6b7b8c"
             tickLine={false}
             axisLine={false}
             fontSize={12}
+            tickMargin={10}
           />
           <YAxis
-            stroke="#64748b"
+            width={54}
+            stroke="#6b7b8c"
             tickLine={false}
             axisLine={false}
             fontSize={12}
@@ -78,9 +80,10 @@ export function LineTrendChart({
           <Tooltip
             formatter={(value) => formatTooltipValue(value)}
             contentStyle={{
-              borderRadius: 16,
-              border: "1px solid #e2e8f0",
-              backgroundColor: "rgba(255,255,255,0.96)",
+              borderRadius: 18,
+              border: "1px solid rgba(205,219,228,0.88)",
+              backgroundColor: "rgba(255,255,255,0.98)",
+              boxShadow: "0 24px 48px -32px rgba(35,58,79,0.3)",
             }}
           />
           <Area
@@ -93,9 +96,9 @@ export function LineTrendChart({
             type="monotone"
             dataKey={yKey}
             stroke={stroke}
-            strokeWidth={3}
-            dot={{ r: 4, strokeWidth: 0 }}
-            activeDot={{ r: 5 }}
+            strokeWidth={3.25}
+            dot={{ r: 4.5, strokeWidth: 0, fill: stroke }}
+            activeDot={{ r: 5.5, fill: stroke }}
           />
         </AreaChart>
       </ResponsiveContainer>

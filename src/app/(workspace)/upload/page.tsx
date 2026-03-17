@@ -30,7 +30,7 @@ function CapabilityCard({
   description: string;
 }) {
   return (
-    <div className="rounded-[28px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_22px_60px_-44px_rgba(15,23,42,0.42)]">
+    <div className="overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.92))] p-6 shadow-[0_22px_60px_-44px_rgba(35,58,79,0.18)]">
       <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-3 text-slate-700">
         <Icon className="size-5" />
       </div>
@@ -50,7 +50,7 @@ function FlowStep({
   description: string;
 }) {
   return (
-    <div className="rounded-[26px] border border-slate-200 bg-white/88 p-5 shadow-[0_20px_56px_-44px_rgba(15,23,42,0.36)]">
+    <div className="overflow-hidden rounded-[26px] border border-white/80 bg-white/90 p-5 shadow-[0_20px_56px_-44px_rgba(35,58,79,0.16)]">
       <div className="flex items-center gap-3">
         <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
           {index}
@@ -65,7 +65,7 @@ function FlowStep({
 export default function UploadPage() {
   return (
     <div className="space-y-8">
-      <section className="overflow-hidden rounded-[38px] border border-[#17314f]/12 bg-[radial-gradient(circle_at_top_left,rgba(35,87,133,0.24),transparent_32%),radial-gradient(circle_at_82%_20%,rgba(92,147,142,0.16),transparent_22%),linear-gradient(135deg,rgba(249,247,242,0.98)_0%,rgba(239,244,247,0.98)_52%,rgba(255,255,255,1)_100%)] p-8 shadow-[0_38px_120px_-54px_rgba(16,33,60,0.72)] lg:p-10">
+      <section className="overflow-hidden rounded-[38px] border border-white/80 bg-[radial-gradient(circle_at_top_left,rgba(86,142,167,0.2),transparent_32%),radial-gradient(circle_at_82%_20%,rgba(92,147,142,0.14),transparent_22%),linear-gradient(135deg,rgba(252,249,244,0.98)_0%,rgba(241,248,250,0.98)_52%,rgba(255,255,255,1)_100%)] p-8 shadow-[0_32px_90px_-52px_rgba(35,58,79,0.24)] lg:p-10">
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
           <div className="min-w-0">
             <Badge variant="neutral">Carga gobernada</Badge>
@@ -102,7 +102,7 @@ export default function UploadPage() {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-[28px] border border-white/70 bg-white/72 p-5 backdrop-blur shadow-[0_24px_60px_-44px_rgba(15,23,42,0.6)]"
+                    className="rounded-[28px] border border-white/80 bg-white/84 p-5 backdrop-blur shadow-[0_22px_52px_-40px_rgba(35,58,79,0.18)]"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     {item.label}
@@ -116,7 +116,7 @@ export default function UploadPage() {
           </div>
 
           <div className="grid gap-4">
-            <div className="rounded-[32px] border border-[#17314f]/10 bg-[linear-gradient(180deg,#10213c_0%,#17314f_58%,#1d4465_100%)] p-6 text-white shadow-[0_30px_80px_-42px_rgba(16,33,60,0.88)]">
+            <div className="rounded-[32px] border border-[#4f8d96]/18 bg-[linear-gradient(160deg,#3d7886_0%,#4e9098_52%,#79b1af_100%)] p-6 text-white shadow-[0_28px_70px_-40px_rgba(55,109,119,0.42)]">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">
@@ -135,7 +135,7 @@ export default function UploadPage() {
               </p>
             </div>
 
-            <div className="rounded-[32px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_26px_80px_-46px_rgba(15,23,42,0.45)]">
+            <div className="rounded-[32px] border border-white/80 bg-white/90 p-6 shadow-[0_24px_60px_-42px_rgba(35,58,79,0.18)]">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
                 Que ya muestra la demo
               </p>
@@ -178,7 +178,7 @@ export default function UploadPage() {
         />
       </section>
 
-      <section className="rounded-[34px] border border-slate-200/80 bg-white/88 p-6 shadow-[0_28px_90px_-50px_rgba(15,23,42,0.5)] lg:p-7">
+      <section className="rounded-[34px] border border-white/80 bg-white/90 p-6 shadow-[0_28px_90px_-50px_rgba(35,58,79,0.18)] lg:p-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
@@ -203,12 +203,12 @@ export default function UploadPage() {
             <div
               key={item.key}
               className={cn(
-                "rounded-[28px] border p-5 shadow-[0_20px_56px_-44px_rgba(15,23,42,0.38)]",
+                "overflow-hidden rounded-[28px] border p-5 shadow-[0_20px_56px_-44px_rgba(35,58,79,0.16)]",
                 datasetSurface[index % datasetSurface.length],
               )}
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="min-w-0 flex flex-wrap items-center gap-2">
                   <h3 className="text-xl font-semibold text-slate-950">{item.label}</h3>
                   <Badge variant="neutral">{item.key}</Badge>
                 </div>
@@ -246,7 +246,7 @@ export default function UploadPage() {
         />
       </section>
 
-      <section className="rounded-[34px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.94))] p-6 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.45)] lg:p-7">
+      <section className="rounded-[34px] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,250,0.94))] p-6 shadow-[0_24px_70px_-48px_rgba(35,58,79,0.18)] lg:p-7">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
             Workbench
@@ -260,7 +260,7 @@ export default function UploadPage() {
           </p>
         </div>
 
-        <div className="mt-6 rounded-[30px] border border-slate-200/80 bg-white/82 p-3 shadow-[0_20px_56px_-44px_rgba(15,23,42,0.34)]">
+        <div className="mt-6 rounded-[30px] border border-white/80 bg-white/84 p-3 shadow-[0_20px_56px_-44px_rgba(35,58,79,0.16)]">
           <IngestionWorkbench />
         </div>
       </section>

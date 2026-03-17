@@ -30,7 +30,7 @@ export function CompanySwitcher({
         Empresa
       </label>
       <select
-        className="w-full min-w-[260px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400"
+        className="w-full min-w-0 rounded-2xl border border-white/80 bg-white/88 px-4 py-3 text-sm text-slate-900 outline-none transition shadow-[0_16px_36px_-28px_rgba(35,58,79,0.2)] focus:border-[#4f8d96]/40"
         value={selectedCompanyId ?? ""}
         onChange={(event) => {
           const nextSearchParams = new URLSearchParams(searchParams.toString());

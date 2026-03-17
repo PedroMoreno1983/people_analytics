@@ -9,9 +9,9 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-[#17314f] bg-[linear-gradient(135deg,#10213c_0%,#17314f_48%,#1d5f7d_100%)] text-white shadow-[0_20px_44px_-24px_rgba(16,33,60,0.72)] hover:-translate-y-0.5 hover:brightness-[1.05] focus-visible:ring-[#1d5f7d]",
+          "border border-[#4f8d96]/22 bg-[linear-gradient(135deg,#3b7e87_0%,#50939a_52%,#73b0ad_100%)] text-white shadow-[0_18px_36px_-26px_rgba(55,109,119,0.42)] hover:-translate-y-0.5 hover:brightness-[1.04] focus-visible:ring-[#4f8d96]",
         secondary:
-          "border border-white/70 bg-white/82 text-slate-900 shadow-[0_16px_36px_-26px_rgba(16,33,60,0.32)] hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white focus-visible:ring-slate-400",
+          "border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(247,250,251,0.98))] text-slate-900 shadow-[0_16px_36px_-26px_rgba(35,58,79,0.22)] hover:-translate-y-0.5 hover:border-[#c9d8e0] hover:bg-white focus-visible:ring-slate-400",
         ghost:
           "text-slate-700 hover:bg-slate-100/80 focus-visible:ring-slate-400"
       },

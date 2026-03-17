@@ -1,6 +1,18 @@
-import "dotenv/config";
-
 import { defineConfig } from "prisma/config";
+import { config as loadEnv } from "dotenv";
+import { existsSync } from "node:fs";
+import path from "node:path";
+
+const localEnvPath = path.resolve(process.cwd(), ".env.local");
+const envPath = path.resolve(process.cwd(), ".env");
+
+if (existsSync(localEnvPath)) {
+  loadEnv({ path: localEnvPath });
+}
+
+if (existsSync(envPath)) {
+  loadEnv({ path: envPath });
+}
 
 const runtimeDatabaseUrl =
   process.env.DATABASE_URL ??

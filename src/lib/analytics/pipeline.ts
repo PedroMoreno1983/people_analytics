@@ -43,6 +43,7 @@ type CompanyWithAnalyticsInputs = Prisma.CompanyGetPayload<{
 
 const WORKING_DAYS_PER_MONTH = 22;
 const MAX_MONTHS_TO_PROCESS = 12;
+const BULK_WRITE_CHUNK_SIZE = 200;
 
 function average(values: number[]) {
   if (values.length === 0) {
@@ -54,6 +55,16 @@ function average(values: number[]) {
 
 function roundTo(value: number, decimals = 2) {
   return Number(value.toFixed(decimals));
+}
+
+function chunk<T>(values: T[], size: number) {
+  const chunks: T[][] = [];
+
+  for (let index = 0; index < values.length; index += size) {
+    chunks.push(values.slice(index, index + size));
+  }
+
+  return chunks;
 }
 
 function getRelevantMonths(company: CompanyWithAnalyticsInputs) {
@@ -180,6 +191,9 @@ export async function runAnalyticsPipeline(options?: {
 
   for (const company of companies) {
     const months = getRelevantMonths(company);
+    const monthStarts = months.map((month) => startOfMonth(month));
+    const employeeRiskRows: Prisma.EmployeeRiskScoreCreateManyInput[] = [];
+    const teamMetricRows: Prisma.TeamMetricsMonthlyCreateManyInput[] = [];
     let employeeScoresUpserted = 0;
     let teamMetricsUpserted = 0;
 
@@ -221,29 +235,14 @@ export async function runAnalyticsPipeline(options?: {
           stressFeedback: computeStressFeedbackRisk(managerSupportScore),
         });
 
-        await client.employeeRiskScore.upsert({
-          where: {
-            employeeId_scoringDate: {
-              employeeId: employee.id,
-              scoringDate: monthStart,
-            },
-          },
-          update: {
-            attritionRisk: roundTo(attrition.score),
-            burnoutRisk: roundTo(burnout.score),
-            driver1: attrition.drivers[0] ?? burnout.drivers[0] ?? null,
-            driver2: attrition.drivers[1] ?? burnout.drivers[1] ?? null,
-            driver3: attrition.drivers[2] ?? burnout.drivers[2] ?? null,
-          },
-          create: {
-            employeeId: employee.id,
-            scoringDate: monthStart,
-            attritionRisk: roundTo(attrition.score),
-            burnoutRisk: roundTo(burnout.score),
-            driver1: attrition.drivers[0] ?? burnout.drivers[0] ?? null,
-            driver2: attrition.drivers[1] ?? burnout.drivers[1] ?? null,
-            driver3: attrition.drivers[2] ?? burnout.drivers[2] ?? null,
-          },
+        employeeRiskRows.push({
+          employeeId: employee.id,
+          scoringDate: monthStart,
+          attritionRisk: roundTo(attrition.score),
+          burnoutRisk: roundTo(burnout.score),
+          driver1: attrition.drivers[0] ?? burnout.drivers[0] ?? null,
+          driver2: attrition.drivers[1] ?? burnout.drivers[1] ?? null,
+          driver3: attrition.drivers[2] ?? burnout.drivers[2] ?? null,
         });
         employeeScoresUpserted += 1;
 
@@ -287,41 +286,55 @@ export async function runAnalyticsPipeline(options?: {
             ),
           );
 
-        await client.teamMetricsMonthly.upsert({
-          where: {
-            departmentId_month: {
-              departmentId: department.id,
-              month: monthStart,
-            },
-          },
-          update: {
-            headcount,
-            turnoverRate: roundTo(turnoverRate, 4),
-            absenteeismRate: roundTo(absenteeismRate, 4),
-            engagementScore: roundTo(average(engagementValues)),
-            burnoutRiskAvg: roundTo(
-              average(departmentScores.map((score) => score.burnoutRisk)),
-            ),
-            attritionRiskAvg: roundTo(
-              average(departmentScores.map((score) => score.attritionRisk)),
-            ),
-          },
-          create: {
-            departmentId: department.id,
-            month: monthStart,
-            headcount,
-            turnoverRate: roundTo(turnoverRate, 4),
-            absenteeismRate: roundTo(absenteeismRate, 4),
-            engagementScore: roundTo(average(engagementValues)),
-            burnoutRiskAvg: roundTo(
-              average(departmentScores.map((score) => score.burnoutRisk)),
-            ),
-            attritionRiskAvg: roundTo(
-              average(departmentScores.map((score) => score.attritionRisk)),
-            ),
-          },
+        teamMetricRows.push({
+          departmentId: department.id,
+          month: monthStart,
+          headcount,
+          turnoverRate: roundTo(turnoverRate, 4),
+          absenteeismRate: roundTo(absenteeismRate, 4),
+          engagementScore: roundTo(average(engagementValues)),
+          burnoutRiskAvg: roundTo(
+            average(departmentScores.map((score) => score.burnoutRisk)),
+          ),
+          attritionRiskAvg: roundTo(
+            average(departmentScores.map((score) => score.attritionRisk)),
+          ),
         });
         teamMetricsUpserted += 1;
+      }
+    }
+
+    if (employeeRiskRows.length > 0) {
+      await client.employeeRiskScore.deleteMany({
+        where: {
+          employeeId: {
+            in: company.employees.map((employee) => employee.id),
+          },
+          scoringDate: {
+            in: monthStarts,
+          },
+        },
+      });
+
+      for (const batch of chunk(employeeRiskRows, BULK_WRITE_CHUNK_SIZE)) {
+        await client.employeeRiskScore.createMany({ data: batch });
+      }
+    }
+
+    if (teamMetricRows.length > 0) {
+      await client.teamMetricsMonthly.deleteMany({
+        where: {
+          departmentId: {
+            in: company.departments.map((department) => department.id),
+          },
+          month: {
+            in: monthStarts,
+          },
+        },
+      });
+
+      for (const batch of chunk(teamMetricRows, BULK_WRITE_CHUNK_SIZE)) {
+        await client.teamMetricsMonthly.createMany({ data: batch });
       }
     }
 

@@ -1,13 +1,35 @@
-import "dotenv/config";
-
 import { PrismaClient } from "@prisma/client";
+import { config as loadEnv } from "dotenv";
+import { existsSync } from "node:fs";
+import path from "node:path";
 
 import { runAnalyticsPipeline } from "../src/lib/analytics/pipeline";
 
-process.env.DATABASE_URL ??=
+const localEnvPath = path.resolve(process.cwd(), ".env.local");
+const envPath = path.resolve(process.cwd(), ".env");
+
+if (existsSync(localEnvPath)) {
+  loadEnv({ path: localEnvPath });
+}
+
+if (existsSync(envPath)) {
+  loadEnv({ path: envPath });
+}
+
+const resolvedSeedDatabaseUrl =
+  process.env.DATABASE_URL ??
+  process.env.DIRECT_URL ??
   "postgresql://postgres:postgres@localhost:5432/datawise_people_analytics?schema=public";
 
-const prisma = new PrismaClient();
+process.env.DATABASE_URL = resolvedSeedDatabaseUrl;
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: resolvedSeedDatabaseUrl,
+    },
+  },
+});
 
 type DepartmentKey = "executive" | "peopleOps" | "sales" | "product" | "operations";
 

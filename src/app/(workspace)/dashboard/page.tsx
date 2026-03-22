@@ -1,4 +1,5 @@
 import { AlertTriangle, ArrowRight, CheckCircle, Info, TrendingDown, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 import { DistributionChart } from "@/components/charts/distribution-chart";
 import { CompanySwitcher } from "@/components/company-switcher";
@@ -50,6 +51,12 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
 
   return (
     <div className="space-y-6">
+      {(summary as any).isDemo && (
+        <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
+          <AlertTriangle className="size-4 shrink-0 text-amber-500" />
+          <span><strong>Demo Mode</strong> — connect a PostgreSQL database and seed it to see live data. <Link href="/upload" className="underline">Upload data →</Link></span>
+        </div>
+      )}
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
         <div className="rounded-[34px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.5)]">
           <div className="flex flex-wrap items-center gap-3">

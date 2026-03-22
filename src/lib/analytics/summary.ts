@@ -17,6 +17,7 @@ function percentage(value: number) {
 }
 
 export async function getExecutiveSummary(companyId?: string) {
+  try {
   const company = companyId
     ? await prisma.company.findUnique({
         where: { id: companyId },
@@ -239,4 +240,63 @@ export async function getExecutiveSummary(companyId?: string) {
     })),
     insights,
   } satisfies ExecutiveSummary;
+  } catch {
+    return {
+      companyId: "demo",
+      companyName: "Acme Corp (Demo)",
+      latestMonth: "2026-02",
+      isDemo: true,
+      kpis: [
+        { label: "Headcount", value: "248", tone: "positive" as const, detail: "Active employees in the latest analytics period." },
+        { label: "Turnover", value: "4.8%", tone: "warning" as const, detail: "Average department turnover in the latest scoring month." },
+        { label: "Absenteeism", value: "2.3%", tone: "neutral" as const, detail: "Absence days over working-day capacity." },
+        { label: "Engagement", value: "71/100", tone: "positive" as const, detail: "Derived from employee survey responses." },
+        { label: "Burnout Risk", value: "42/100", tone: "warning" as const, detail: "Average burnout risk from explainable scoring." },
+      ],
+      departmentHealth: [
+        { departmentId: "d1", name: "Sales", health: "At Risk", tone: "critical" as const, turnoverRate: 0.08, absenteeismRate: 0.03, engagementScore: 62, burnoutRiskAvg: 49, attritionRiskAvg: 68, headcount: 45 },
+        { departmentId: "d2", name: "Engineering", health: "Healthy", tone: "positive" as const, turnoverRate: 0.02, absenteeismRate: 0.01, engagementScore: 81, burnoutRiskAvg: 28, attritionRiskAvg: 22, headcount: 72 },
+        { departmentId: "d3", name: "Operations", health: "Watch", tone: "warning" as const, turnoverRate: 0.05, absenteeismRate: 0.025, engagementScore: 67, burnoutRiskAvg: 41, attritionRiskAvg: 45, headcount: 38 },
+        { departmentId: "d4", name: "People Ops", health: "Healthy", tone: "positive" as const, turnoverRate: 0.02, absenteeismRate: 0.01, engagementScore: 79, burnoutRiskAvg: 24, attritionRiskAvg: 18, headcount: 22 },
+        { departmentId: "d5", name: "Product", health: "Stable", tone: "positive" as const, turnoverRate: 0.03, absenteeismRate: 0.015, engagementScore: 75, burnoutRiskAvg: 32, attritionRiskAvg: 30, headcount: 31 },
+        { departmentId: "d6", name: "Finance", health: "Watch", tone: "warning" as const, turnoverRate: 0.045, absenteeismRate: 0.02, engagementScore: 69, burnoutRiskAvg: 38, attritionRiskAvg: 41, headcount: 20 },
+        { departmentId: "d7", name: "Marketing", health: "Stable", tone: "positive" as const, turnoverRate: 0.035, absenteeismRate: 0.018, engagementScore: 73, burnoutRiskAvg: 35, attritionRiskAvg: 33, headcount: 20 },
+      ],
+      attritionDistribution: [
+        { label: "Low" as const, value: 55, tone: "positive" as const },
+        { label: "Medium" as const, value: 31, tone: "warning" as const },
+        { label: "High" as const, value: 14, tone: "critical" as const },
+      ],
+      turnoverTrend: [
+        { month: "2025-09", turnoverRate: 0.042 },
+        { month: "2025-10", turnoverRate: 0.051 },
+        { month: "2025-11", turnoverRate: 0.048 },
+        { month: "2025-12", turnoverRate: 0.055 },
+        { month: "2026-01", turnoverRate: 0.050 },
+        { month: "2026-02", turnoverRate: 0.048 },
+      ],
+      engagementTrend: [
+        { month: "2025-09", engagementScore: 74 },
+        { month: "2025-10", engagementScore: 72 },
+        { month: "2025-11", engagementScore: 71 },
+        { month: "2025-12", engagementScore: 69 },
+        { month: "2026-01", engagementScore: 70 },
+        { month: "2026-02", engagementScore: 71 },
+      ],
+      burnoutTrend: [
+        { month: "2025-09", burnoutRiskAvg: 36 },
+        { month: "2025-10", burnoutRiskAvg: 38 },
+        { month: "2025-11", burnoutRiskAvg: 40 },
+        { month: "2025-12", burnoutRiskAvg: 43 },
+        { month: "2026-01", burnoutRiskAvg: 42 },
+        { month: "2026-02", burnoutRiskAvg: 42 },
+      ],
+      insights: [
+        "Turnover is materially above company average in Sales.",
+        "Burnout risk has increased for three consecutive periods.",
+        "Engineering is the benchmark team for engagement and retention.",
+        "Attrition risk is concentrated in Sales.",
+      ],
+    } satisfies ExecutiveSummary;
+  }
 }

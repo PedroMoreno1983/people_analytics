@@ -1,175 +1,179 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  BarChart3,
-  Building2,
-  Database,
-  ShieldCheck,
-  Upload,
-} from "lucide-react";
-
-import { SectionCard } from "@/components/section-card";
-import { buttonVariants } from "@/components/ui/button";
-import { architectureLayers } from "@/lib/placeholder-data";
+import { ArrowRight, BarChart3, Building2, ShieldCheck, Upload, Users, TrendingDown, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto max-w-[1600px] px-4 py-8 lg:px-6 lg:py-10">
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-        <div className="rounded-[36px] border border-slate-200/80 bg-white/85 p-8 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.5)] lg:p-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-            DataWise People Analytics
-          </p>
-          <h1 className="mt-4 max-w-3xl font-serif text-5xl font-semibold tracking-tight text-slate-950">
-            Explainable people analytics for executive and operating teams.
+    <main>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 py-20 lg:px-6 lg:py-28">
+        {/* Decorative blobs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 right-0 h-[600px] w-[600px] rounded-full bg-indigo-600/20 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-purple-600/15 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-[1200px]">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-indigo-300">
+            <Zap className="size-3" />
+            People Analytics Platform
+          </div>
+
+          <h1 className="max-w-3xl font-serif text-5xl font-semibold leading-tight tracking-tight text-white lg:text-6xl">
+            Organizational intelligence that{" "}
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              actually explains itself.
+            </span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            Real-time organizational health intelligence — attrition risk, burnout signals,
-            engagement trends and department-level insights, all driven by your HR data.
+
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+            Real-time attrition risk, burnout signals, engagement trends and department-level insights — all driven by your HR data and explainable to every stakeholder.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/dashboard" className={buttonVariants({ size: "lg" })}>
+
+          <div className="mt-10 flex flex-wrap gap-4">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/50 transition-colors hover:bg-indigo-500">
               Open dashboard
+              <ArrowRight className="size-4" />
             </Link>
-            <Link
-              href="/departments"
-              className={buttonVariants({ variant: "secondary", size: "lg" })}
-            >
+            <Link href="/departments" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/15">
               View departments
             </Link>
           </div>
+
+          {/* Stats row */}
+          <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              { value: "248", label: "Employees tracked", color: "text-emerald-400" },
+              { value: "7", label: "Departments scored", color: "text-indigo-400" },
+              { value: "4.8%", label: "Avg turnover", color: "text-amber-400" },
+              { value: "71/100", label: "Engagement score", color: "text-purple-400" },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+                <p className={`font-serif text-3xl font-semibold ${stat.color}`}>{stat.value}</p>
+                <p className="mt-1 text-sm text-slate-400">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="mx-auto max-w-[1200px] px-4 py-16 lg:px-6">
+        <div className="mb-10 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600">What you get</p>
+          <h2 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Everything your HR team needs</h2>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {[
             {
-              icon: Database,
-              title: "PostgreSQL + Prisma foundation",
-              description:
-                "All HR data persisted in a normalized schema: employees, absences, performance reviews, surveys and computed risk scores.",
+              icon: BarChart3,
+              title: "Executive Dashboard",
+              description: "KPIs, attrition distribution, burnout and engagement trends — all at a glance for leadership.",
+              href: "/dashboard",
+              bg: "bg-indigo-600",
+              lightBg: "bg-indigo-50",
+              border: "border-indigo-100",
+              textColor: "text-indigo-700",
+            },
+            {
+              icon: Building2,
+              title: "Department Intelligence",
+              description: "Each department gets its own health card, risk drivers and actionable insights for HR partners.",
+              href: "/departments",
+              bg: "bg-emerald-600",
+              lightBg: "bg-emerald-50",
+              border: "border-emerald-100",
+              textColor: "text-emerald-700",
             },
             {
               icon: Upload,
-              title: "CSV / XLSX ingestion",
-              description:
-                "Upload employee files directly and map columns to normalized fields with automatic header synonym matching.",
-            },
-            {
-              icon: BarChart3,
-              title: "Executive dashboard",
-              description:
-                "KPIs, attrition risk distribution, turnover and engagement trends — all computed from live analytics data.",
+              title: "CSV / XLSX Ingestion",
+              description: "Drop a file, map columns automatically and trigger the analytics pipeline to refresh scores.",
+              href: "/upload",
+              bg: "bg-amber-500",
+              lightBg: "bg-amber-50",
+              border: "border-amber-100",
+              textColor: "text-amber-700",
             },
             {
               icon: ShieldCheck,
-              title: "Explainable risk scoring",
-              description:
-                "Attrition and burnout scores are decomposed into weighted drivers so HR leaders understand the why behind every signal.",
+              title: "Explainable Risk Scores",
+              description: "Attrition and burnout scores decomposed into weighted drivers. HR knows the why, not just the number.",
+              href: "/dashboard",
+              bg: "bg-rose-600",
+              lightBg: "bg-rose-50",
+              border: "border-rose-100",
+              textColor: "text-rose-700",
             },
-          ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-[28px] border border-slate-200/80 bg-white/80 p-6"
+          ].map((feature) => (
+            <Link
+              key={feature.title}
+              href={feature.href}
+              className={`group rounded-3xl border ${feature.border} ${feature.lightBg} p-6 transition-all hover:-translate-y-1 hover:shadow-lg`}
             >
-              <item.icon className="size-5 text-slate-700" />
-              <h2 className="mt-4 text-xl font-semibold text-slate-950">
-                {item.title}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {item.description}
-              </p>
-            </div>
+              <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${feature.bg} text-white shadow-md`}>
+                <feature.icon className="size-5" />
+              </div>
+              <h3 className="mt-5 text-lg font-semibold text-slate-900">{feature.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{feature.description}</p>
+              <div className={`mt-4 flex items-center gap-1 text-sm font-semibold ${feature.textColor}`}>
+                Explore
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </div>
+            </Link>
           ))}
         </div>
       </section>
 
-      <section className="mt-6 grid gap-6 lg:grid-cols-3">
-        {[
-          {
-            icon: BarChart3,
-            label: "Executive visibility",
-            title: "Org health at a glance",
-            description:
-              "Headcount, turnover, engagement and burnout risk rolled up to a single executive dashboard with department drill-down.",
-            href: "/dashboard",
-            cta: "Open dashboard",
-          },
-          {
-            icon: Building2,
-            label: "Operating teams",
-            title: "Department-level intelligence",
-            description:
-              "Each department gets its own health card, trend sparklines, top risk drivers and actionable insights for HR business partners.",
-            href: "/departments",
-            cta: "View departments",
-          },
-          {
-            icon: Upload,
-            label: "Data ingestion",
-            title: "Upload and update",
-            description:
-              "Drop a CSV or XLSX file, preview the data, map columns and trigger the analytics pipeline to refresh all scores and metrics.",
-            href: "/upload",
-            cta: "Upload data",
-          },
-        ].map((item) => (
-          <div
-            key={item.title}
-            className="rounded-[30px] border border-slate-200/80 bg-white/85 p-8"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-              {item.label}
-            </p>
-            <h2 className="mt-4 font-serif text-2xl font-semibold text-slate-950">
-              {item.title}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              {item.description}
-            </p>
-            <Link
-              href={item.href}
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-900"
-            >
-              {item.cta}
-              <ArrowRight className="size-4" />
-            </Link>
+      {/* Pipeline section */}
+      <section className="border-t border-slate-200 bg-white px-4 py-16 lg:px-6">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="mb-10 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600">Under the hood</p>
+            <h2 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Five-layer analytics pipeline</h2>
+            <p className="mt-3 text-slate-500">Raw HR data flows through ingestion, normalization, scoring and storage before powering dashboards.</p>
           </div>
-        ))}
-      </section>
-
-      <section className="mt-6">
-        <SectionCard
-          eyebrow="Architecture"
-          title="Five-layer analytics pipeline"
-          description="Raw HR data flows through ingestion, normalization, explainable scoring and analytics storage before powering dashboard queries."
-          action={
-            <Link
-              href="/api/health"
-              className={buttonVariants({ variant: "secondary", size: "sm" })}
-            >
-              Runtime check
-            </Link>
-          }
-        >
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {architectureLayers.map((layer, index) => (
-              <div
-                key={layer.name}
-                className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-5"
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Layer {index + 1}
-                </p>
-                <h3 className="mt-3 text-lg font-semibold text-slate-950">
-                  {layer.name}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {layer.detail}
-                </p>
+          <div className="grid gap-4 md:grid-cols-5">
+            {[
+              { step: "01", name: "Ingestion", detail: "Parse CSV/XLSX, preview, map columns, validate." },
+              { step: "02", name: "Operational Data", detail: "Employees, absences, reviews, surveys." },
+              { step: "03", name: "Analytics Services", detail: "Turnover, engagement, attrition, burnout." },
+              { step: "04", name: "Analytics Storage", detail: "EmployeeRiskScore and TeamMetricsMonthly." },
+              { step: "05", name: "Dashboard Queries", detail: "Executive summary, trends, distributions." },
+            ].map((layer, i) => (
+              <div key={layer.step} className="relative rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                {i < 4 && (
+                  <div className="absolute -right-2 top-1/2 z-10 hidden -translate-y-1/2 md:block">
+                    <div className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                      <ArrowRight className="size-2.5" />
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs font-bold text-indigo-400">{layer.step}</p>
+                <h3 className="mt-2 font-semibold text-slate-900">{layer.name}</h3>
+                <p className="mt-1 text-xs leading-5 text-slate-500">{layer.detail}</p>
               </div>
             ))}
           </div>
-        </SectionCard>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-14 lg:px-6">
+        <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div>
+            <h2 className="font-serif text-2xl font-semibold text-white">Ready to see your org health?</h2>
+            <p className="mt-2 text-indigo-200">Upload your HR data and get insights in minutes.</p>
+          </div>
+          <div className="flex flex-shrink-0 gap-3">
+            <Link href="/dashboard" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-indigo-700 shadow-md transition-colors hover:bg-indigo-50">
+              Open dashboard
+            </Link>
+            <Link href="/upload" className="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">
+              Upload data
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );

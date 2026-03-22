@@ -10,6 +10,7 @@ export type ExecutiveSummary = {
   companyId: string;
   companyName: string;
   latestMonth: string | null;
+  isDemo?: boolean;
   kpis: Array<{
     label: string;
     value: string;

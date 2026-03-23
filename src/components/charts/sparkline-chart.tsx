@@ -8,21 +8,27 @@ type SparklineChartProps = {
   data: Array<Record<string, string | number>>;
   yKey: string;
   stroke: string;
-  formatter?: (value: number) => string;
+  format?: "percentage" | "score" | "raw";
 };
 
 export function SparklineChart({
   data,
   yKey,
   stroke,
-  formatter,
+  format = "raw",
 }: SparklineChartProps) {
   const gradientId = `sparkline-gradient-${yKey}`;
+
+  const fmt = (value: number): string => {
+    if (format === "percentage") return `${(value * 100).toFixed(1)}%`;
+    if (format === "score") return `${value.toFixed(0)}/100`;
+    return String(value);
+  };
 
   const formatValue = (value: TooltipValue) => {
     const candidate = Array.isArray(value) ? value[0] : value;
     const numericValue = typeof candidate === "number" ? candidate : Number(candidate ?? 0);
-    return formatter ? formatter(numericValue) : numericValue.toString();
+    return fmt(numericValue);
   };
 
   return (

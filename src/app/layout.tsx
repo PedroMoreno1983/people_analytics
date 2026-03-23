@@ -5,12 +5,12 @@ import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: "DataWise People Analytics",
-  description: "Explainable people analytics platform for executive and operating teams."
+  description: "Plataforma de people analytics explicable para equipos ejecutivos y operativos."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>
         <header className="sticky top-0 z-20 border-b border-white/60 bg-white/70 backdrop-blur-md">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3 lg:px-6">
@@ -32,10 +32,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                 Dashboard
               </Link>
               <Link href="/departments" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">
-                Departments
+                Departamentos
               </Link>
               <Link href="/upload" className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-indigo-200 transition-colors hover:bg-indigo-700">
-                Upload data
+                Subir datos
               </Link>
             </nav>
           </div>

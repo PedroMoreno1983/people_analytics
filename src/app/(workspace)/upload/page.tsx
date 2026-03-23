@@ -8,15 +8,15 @@ export default function UploadPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-[34px] border border-slate-200/80 bg-white/85 p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-          Ingestion surface
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-500">
+          Ingesta de datos
         </p>
         <h1 className="mt-4 font-serif text-4xl font-semibold tracking-tight text-slate-950">
-          CSV and XLSX upload belongs in a controlled workflow, not in ad-hoc scripts.
+          Subí tus archivos HR y actualizá el pipeline de analytics al instante.
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
-          Phase 2 will wire parsing, preview and mapping into this route. Phase 1
-          leaves the contracts and UX zones ready so persistence can land cleanly.
+          Cargá archivos CSV o XLSX, mapeá columnas automáticamente y disparará el recálculo
+          de todos los scores de riesgo y métricas de equipo.
         </p>
       </section>
 
@@ -24,25 +24,34 @@ export default function UploadPage() {
         {[
           {
             icon: FileSpreadsheet,
-            title: "Source files",
-            description: "CSV and XLSX are the supported input formats for MVP ingestion."
+            title: "Formatos soportados",
+            description: "CSV y XLSX son los formatos de entrada aceptados para la ingesta.",
+            color: "text-indigo-600",
+            bg: "bg-indigo-50",
+            border: "border-indigo-100",
           },
           {
             icon: ShieldCheck,
-            title: "Validation",
-            description: "All incoming fields will cross a Zod boundary before persistence."
+            title: "Validación automática",
+            description: "Todos los campos entrantes pasan por un esquema Zod antes de persistirse.",
+            color: "text-emerald-600",
+            bg: "bg-emerald-50",
+            border: "border-emerald-100",
           },
           {
             icon: Workflow,
-            title: "Normalization",
-            description: "Mapped records will end in Prisma operational tables, not loose JSON blobs."
-          }
+            title: "Normalización",
+            description: "Los registros mapeados se guardan en tablas Prisma normalizadas, no en JSON suelto.",
+            color: "text-amber-600",
+            bg: "bg-amber-50",
+            border: "border-amber-100",
+          },
         ].map((item) => (
           <div
             key={item.title}
-            className="rounded-[28px] border border-slate-200/80 bg-white/85 p-6"
+            className={`rounded-[28px] border ${item.border} ${item.bg} p-6`}
           >
-            <item.icon className="size-5 text-slate-700" />
+            <item.icon className={`size-5 ${item.color}`} />
             <h2 className="mt-4 text-xl font-semibold text-slate-950">
               {item.title}
             </h2>
@@ -54,17 +63,17 @@ export default function UploadPage() {
       </section>
 
       <SectionCard
-        eyebrow="Supported datasets"
-        title="What Phase 2 will ingest first"
-        description="The MVP backlog points to employee, absence, performance and survey inputs first."
+        eyebrow="Datasets soportados"
+        title="Qué podés cargar"
+        description="El pipeline soporta empleados, ausentismo, evaluaciones de desempeño y encuestas."
       >
         <div className="overflow-hidden rounded-[24px] border border-slate-200">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-slate-50 text-left text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-medium">Dataset</th>
-                <th className="px-4 py-3 font-medium">Format</th>
-                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Formato</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
@@ -84,8 +93,8 @@ export default function UploadPage() {
 
       <SectionCard
         eyebrow="Workbench"
-        title="Phase 2 ingestion flow"
-        description="This is the working vertical slice: upload, preview, column mapping, validation and Prisma persistence."
+        title="Flujo de ingesta"
+        description="Subí, previsualizá, mapeá columnas y persistí los datos en el pipeline de analytics."
       >
         <IngestionWorkbench />
       </SectionCard>

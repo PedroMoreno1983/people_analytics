@@ -1,51 +1,42 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, Building2, ShieldCheck, Upload, Users, TrendingDown, Zap } from "lucide-react";
+import { ArrowRight, BarChart3, Building2, ShieldCheck, Upload, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
     <main>
-      {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 py-20 lg:px-6 lg:py-28">
-        {/* Decorative blobs */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 right-0 h-[600px] w-[600px] rounded-full bg-indigo-600/20 blur-3xl" />
           <div className="absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full bg-purple-600/15 blur-3xl" />
         </div>
-
         <div className="relative mx-auto max-w-[1200px]">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-indigo-300">
             <Zap className="size-3" />
-            People Analytics Platform
+            Plataforma de People Analytics
           </div>
-
           <h1 className="max-w-3xl font-serif text-5xl font-semibold leading-tight tracking-tight text-white lg:text-6xl">
-            Organizational intelligence that{" "}
+            Inteligencia organizacional que{" "}
             <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              actually explains itself.
+              realmente se explica sola.
             </span>
           </h1>
-
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            Real-time attrition risk, burnout signals, engagement trends and department-level insights — all driven by your HR data and explainable to every stakeholder.
+            Riesgo de rotación en tiempo real, señales de burnout, tendencias de engagement e insights por departamento — impulsado por tus datos de RR.HH.
           </p>
-
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/50 transition-colors hover:bg-indigo-500">
-              Open dashboard
-              <ArrowRight className="size-4" />
+              Abrir dashboard <ArrowRight className="size-4" />
             </Link>
             <Link href="/departments" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/15">
-              View departments
+              Ver departamentos
             </Link>
           </div>
-
-          {/* Stats row */}
           <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { value: "248", label: "Employees tracked", color: "text-emerald-400" },
-              { value: "7", label: "Departments scored", color: "text-indigo-400" },
-              { value: "4.8%", label: "Avg turnover", color: "text-amber-400" },
-              { value: "71/100", label: "Engagement score", color: "text-purple-400" },
+              { value: "248", label: "Empleados analizados", color: "text-emerald-400" },
+              { value: "7", label: "Departamentos con score", color: "text-indigo-400" },
+              { value: "4.8%", label: "Rotación promedio", color: "text-amber-400" },
+              { value: "71/100", label: "Score de engagement", color: "text-purple-400" },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <p className={`font-serif text-3xl font-semibold ${stat.color}`}>{stat.value}</p>
@@ -56,90 +47,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Grid */}
       <section className="mx-auto max-w-[1200px] px-4 py-16 lg:px-6">
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600">What you get</p>
-          <h2 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Everything your HR team needs</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600">Qué incluye</p>
+          <h2 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Todo lo que tu equipo de RR.HH. necesita</h2>
         </div>
-
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {[
-            {
-              icon: BarChart3,
-              title: "Executive Dashboard",
-              description: "KPIs, attrition distribution, burnout and engagement trends — all at a glance for leadership.",
-              href: "/dashboard",
-              bg: "bg-indigo-600",
-              lightBg: "bg-indigo-50",
-              border: "border-indigo-100",
-              textColor: "text-indigo-700",
-            },
-            {
-              icon: Building2,
-              title: "Department Intelligence",
-              description: "Each department gets its own health card, risk drivers and actionable insights for HR partners.",
-              href: "/departments",
-              bg: "bg-emerald-600",
-              lightBg: "bg-emerald-50",
-              border: "border-emerald-100",
-              textColor: "text-emerald-700",
-            },
-            {
-              icon: Upload,
-              title: "CSV / XLSX Ingestion",
-              description: "Drop a file, map columns automatically and trigger the analytics pipeline to refresh scores.",
-              href: "/upload",
-              bg: "bg-amber-500",
-              lightBg: "bg-amber-50",
-              border: "border-amber-100",
-              textColor: "text-amber-700",
-            },
-            {
-              icon: ShieldCheck,
-              title: "Explainable Risk Scores",
-              description: "Attrition and burnout scores decomposed into weighted drivers. HR knows the why, not just the number.",
-              href: "/dashboard",
-              bg: "bg-rose-600",
-              lightBg: "bg-rose-50",
-              border: "border-rose-100",
-              textColor: "text-rose-700",
-            },
+            { icon: BarChart3, title: "Dashboard Ejecutivo", description: "KPIs, distribución de riesgo, burnout y tendencias de engagement para liderazgo.", href: "/dashboard", bg: "bg-indigo-600", lightBg: "bg-indigo-50", border: "border-indigo-100", textColor: "text-indigo-700" },
+            { icon: Building2, title: "Inteligencia Departamental", description: "Cada departamento tiene su tarjeta de salud, factores de riesgo e insights para HRBP.", href: "/departments", bg: "bg-emerald-600", lightBg: "bg-emerald-50", border: "border-emerald-100", textColor: "text-emerald-700" },
+            { icon: Upload, title: "Ingesta CSV / XLSX", description: "Subí un archivo, mapeá columnas automáticamente y disparará el pipeline de analytics.", href: "/upload", bg: "bg-amber-500", lightBg: "bg-amber-50", border: "border-amber-100", textColor: "text-amber-700" },
+            { icon: ShieldCheck, title: "Scores Explicables", description: "Rotación y burnout descompuestos en factores ponderados. RR.HH. entiende el porqué.", href: "/dashboard", bg: "bg-rose-600", lightBg: "bg-rose-50", border: "border-rose-100", textColor: "text-rose-700" },
           ].map((feature) => (
-            <Link
-              key={feature.title}
-              href={feature.href}
-              className={`group rounded-3xl border ${feature.border} ${feature.lightBg} p-6 transition-all hover:-translate-y-1 hover:shadow-lg`}
-            >
+            <Link key={feature.title} href={feature.href} className={`group rounded-3xl border ${feature.border} ${feature.lightBg} p-6 transition-all hover:-translate-y-1 hover:shadow-lg`}>
               <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${feature.bg} text-white shadow-md`}>
                 <feature.icon className="size-5" />
               </div>
               <h3 className="mt-5 text-lg font-semibold text-slate-900">{feature.title}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">{feature.description}</p>
               <div className={`mt-4 flex items-center gap-1 text-sm font-semibold ${feature.textColor}`}>
-                Explore
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                Explorar <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Pipeline section */}
       <section className="border-t border-slate-200 bg-white px-4 py-16 lg:px-6">
         <div className="mx-auto max-w-[1200px]">
           <div className="mb-10 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600">Under the hood</p>
-            <h2 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Five-layer analytics pipeline</h2>
-            <p className="mt-3 text-slate-500">Raw HR data flows through ingestion, normalization, scoring and storage before powering dashboards.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600">Arquitectura</p>
+            <h2 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Pipeline de analytics en cinco capas</h2>
+            <p className="mt-3 text-slate-500">Los datos HR fluyen por ingesta, normalización, scoring y almacenamiento antes de alimentar los dashboards.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-5">
             {[
-              { step: "01", name: "Ingestion", detail: "Parse CSV/XLSX, preview, map columns, validate." },
-              { step: "02", name: "Operational Data", detail: "Employees, absences, reviews, surveys." },
-              { step: "03", name: "Analytics Services", detail: "Turnover, engagement, attrition, burnout." },
-              { step: "04", name: "Analytics Storage", detail: "EmployeeRiskScore and TeamMetricsMonthly." },
-              { step: "05", name: "Dashboard Queries", detail: "Executive summary, trends, distributions." },
+              { step: "01", name: "Ingesta", detail: "Parseo CSV/XLSX, preview, mapeo de columnas, validación." },
+              { step: "02", name: "Datos Operativos", detail: "Empleados, ausentismo, evaluaciones, encuestas." },
+              { step: "03", name: "Servicios Analytics", detail: "Rotación, engagement, riesgo de rotación, burnout." },
+              { step: "04", name: "Almacenamiento", detail: "EmployeeRiskScore y TeamMetricsMonthly." },
+              { step: "05", name: "Consultas Dashboard", detail: "Resumen ejecutivo, tendencias, distribuciones." },
             ].map((layer, i) => (
               <div key={layer.step} className="relative rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 {i < 4 && (
@@ -158,19 +105,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-14 lg:px-6">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>
-            <h2 className="font-serif text-2xl font-semibold text-white">Ready to see your org health?</h2>
-            <p className="mt-2 text-indigo-200">Upload your HR data and get insights in minutes.</p>
+            <h2 className="font-serif text-2xl font-semibold text-white">¿Listo para ver la salud de tu organización?</h2>
+            <p className="mt-2 text-indigo-200">Subí tus datos de RR.HH. y obtené insights en minutos.</p>
           </div>
           <div className="flex flex-shrink-0 gap-3">
             <Link href="/dashboard" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-indigo-700 shadow-md transition-colors hover:bg-indigo-50">
-              Open dashboard
+              Abrir dashboard
             </Link>
             <Link href="/upload" className="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">
-              Upload data
+              Subir datos
             </Link>
           </div>
         </div>

@@ -25,7 +25,7 @@ export function CompanySwitcher({
   return (
     <div className="space-y-2">
       <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-        Company
+        Empresa
       </label>
       <select
         className="w-full min-w-[260px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400"

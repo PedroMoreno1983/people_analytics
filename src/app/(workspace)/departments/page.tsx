@@ -15,13 +15,13 @@ function formatPercentage(value: number) {
 
 function InsightIcon({ text }: { text: string }) {
   const lower = text.toLowerCase();
-  if (lower.includes("elevated") || lower.includes("above") || lower.includes("below")) {
+  if (lower.includes("elevado") || lower.includes("superior") || lower.includes("inferior") || lower.includes("elevated") || lower.includes("above") || lower.includes("below")) {
     return <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-500" />;
   }
-  if (lower.includes("no acute") || lower.includes("no material")) {
+  if (lower.includes("sin alertas") || lower.includes("no acute") || lower.includes("no material")) {
     return <CheckCircle className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />;
   }
-  if (lower.includes("high attrition") || lower.includes("employees are in high")) {
+  if (lower.includes("alta rotación") || lower.includes("high attrition") || lower.includes("employees are in high")) {
     return <Flame className="mt-0.5 size-3.5 shrink-0 text-rose-500" />;
   }
   return <Info className="mt-0.5 size-3.5 shrink-0 text-slate-400" />;
@@ -40,7 +40,7 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
     return (
       <div className="rounded-[32px] border border-slate-200 bg-white/90 p-8">
         <p className="text-sm text-slate-500">
-          No department analytics are available yet. Seed the database and run the analytics pipeline first.
+          No hay datos de departamentos disponibles. Conectá la base de datos y ejecutá el pipeline de analytics primero.
         </p>
       </div>
     );
@@ -70,7 +70,7 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
     <div className="space-y-6">
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
         <div className="rounded-[34px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.5)]">
-          <Badge variant="neutral">Department dashboard</Badge>
+          <Badge variant="neutral">Dashboard de departamentos</Badge>
           <div className="mt-5 max-w-sm">
             <CompanySwitcher
               companies={companies}
@@ -78,27 +78,27 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
             />
           </div>
           <h1 className="mt-5 font-serif text-4xl font-semibold tracking-tight text-slate-950">
-            Department health in {dashboard.companyName}.
+            Salud departamental en {dashboard.companyName}.
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
-            Latest health state, trend context, recurring risk drivers and signals
-            that deserve intervention first — for every team in the organization.
+            Estado actual de salud, contexto de tendencias, factores de riesgo recurrentes y señales
+            que requieren intervención prioritaria — para cada equipo de la organización.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-100 pt-6 sm:grid-cols-4">
             <div>
-              <p className="text-xs font-medium text-slate-500">Total headcount</p>
+              <p className="text-xs font-medium text-slate-500">Headcount total</p>
               <p className="mt-1 font-serif text-2xl font-semibold text-slate-950">{totalHeadcount}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500">Departments</p>
+              <p className="text-xs font-medium text-slate-500">Departamentos</p>
               <p className="mt-1 font-serif text-2xl font-semibold text-slate-950">{dashboard.departments.length}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500">Avg engagement</p>
+              <p className="text-xs font-medium text-slate-500">Engagement promedio</p>
               <p className="mt-1 font-serif text-2xl font-semibold text-slate-950">{avgEngagement.toFixed(0)}/100</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500">Healthy rate</p>
+              <p className="text-xs font-medium text-slate-500">Tasa saludable</p>
               <p className="mt-1 font-serif text-2xl font-semibold text-slate-950">
                 {dashboard.departments.length > 0
                   ? Math.round((healthyCount / dashboard.departments.length) * 100)
@@ -111,25 +111,25 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
         <div className="grid gap-4 sm:grid-cols-3">
           {[
             {
-              label: "At Risk",
+              label: "En Riesgo",
               value: criticalCount,
               icon: Flame,
               tone: "critical" as const,
-              description: "Departments requiring immediate attention.",
+              description: "Departamentos que requieren atención inmediata.",
             },
             {
-              label: "Watch",
+              label: "En Alerta",
               value: warningCount,
               icon: Activity,
               tone: "warning" as const,
-              description: "Departments showing early warning signals.",
+              description: "Departamentos con señales de alerta temprana.",
             },
             {
-              label: "Healthy",
+              label: "Saludables",
               value: healthyCount,
               icon: Users,
               tone: "positive" as const,
-              description: "Departments within acceptable thresholds.",
+              description: "Departamentos dentro de umbrales aceptables.",
             },
           ].map((item) => (
             <div
@@ -152,9 +152,9 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
       </section>
 
       <SectionCard
-        eyebrow="Operating view"
-        title="Department cards"
-        description="Sorted by severity first, then by attrition risk average."
+        eyebrow="Vista operativa"
+        title="Tarjetas por departamento"
+        description="Ordenadas por severidad primero, luego por riesgo de rotación promedio."
       >
         <div className="grid gap-5 xl:grid-cols-2">
           {dashboard.departments.map((department) => (
@@ -171,20 +171,20 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
                     <Badge variant={department.tone}>{department.health}</Badge>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-slate-500">
-                    Latest month {department.latestMonth ?? "N/A"} · Headcount {department.headcount}
+                    Último mes: {department.latestMonth ?? "N/A"} · Headcount: {department.headcount}
                   </p>
                 </div>
               </div>
 
               <dl className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
                 <div className="rounded-2xl bg-slate-50 p-3">
-                  <dt className="text-slate-500">Turnover</dt>
+                  <dt className="text-slate-500">Rotación</dt>
                   <dd className="mt-1 font-semibold text-slate-950">
                     {formatPercentage(department.turnoverRate)}
                   </dd>
                 </div>
                 <div className="rounded-2xl bg-slate-50 p-3">
-                  <dt className="text-slate-500">Absenteeism</dt>
+                  <dt className="text-slate-500">Ausentismo</dt>
                   <dd className="mt-1 font-semibold text-slate-950">
                     {formatPercentage(department.absenteeismRate)}
                   </dd>
@@ -205,27 +205,27 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium text-slate-700">Attrition trend</p>
+                  <p className="text-sm font-medium text-slate-700">Tendencia de rotación</p>
                   <SparklineChart
                     data={department.trends}
                     yKey="attritionRiskAvg"
                     stroke="#ef4444"
-                    formatter={(value) => `${value.toFixed(0)}/100`}
+                    format="score"
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-700">Burnout trend</p>
+                  <p className="text-sm font-medium text-slate-700">Tendencia de burnout</p>
                   <SparklineChart
                     data={department.trends}
                     yKey="burnoutRiskAvg"
                     stroke="#f97316"
-                    formatter={(value) => `${value.toFixed(0)}/100`}
+                    format="score"
                   />
                 </div>
               </div>
 
               <div className="mt-5">
-                <p className="text-sm font-medium text-slate-700">Top drivers</p>
+                <p className="text-sm font-medium text-slate-700">Principales factores</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {department.topDrivers.length > 0 ? (
                     department.topDrivers.map((driver) => (
@@ -234,7 +234,7 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
                       </Badge>
                     ))
                   ) : (
-                    <span className="text-sm text-slate-500">No dominant drivers captured yet.</span>
+                    <span className="text-sm text-slate-500">Sin factores dominantes registrados aún.</span>
                   )}
                 </div>
               </div>
@@ -256,19 +256,19 @@ export default async function DepartmentsPage(props: PageProps<"/departments">) 
       </SectionCard>
 
       <SectionCard
-        eyebrow="Comparison"
-        title="Department comparison table"
-        description="Quick cross-team read for HR leadership and general management."
+        eyebrow="Comparación"
+        title="Tabla comparativa de departamentos"
+        description="Lectura cruzada rápida para líderes de RR.HH. y gerencia general."
       >
         <div className="overflow-hidden rounded-[24px] border border-slate-200">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-slate-50 text-left text-slate-500">
               <tr>
-                <th className="px-4 py-3 font-medium">Department</th>
-                <th className="px-4 py-3 font-medium">Health</th>
+                <th className="px-4 py-3 font-medium">Departamento</th>
+                <th className="px-4 py-3 font-medium">Salud</th>
                 <th className="px-4 py-3 font-medium">Headcount</th>
-                <th className="px-4 py-3 font-medium">Turnover</th>
-                <th className="px-4 py-3 font-medium">Attrition risk</th>
+                <th className="px-4 py-3 font-medium">Rotación</th>
+                <th className="px-4 py-3 font-medium">Riesgo rotación</th>
                 <th className="px-4 py-3 font-medium">Burnout</th>
                 <th className="px-4 py-3 font-medium">Engagement</th>
               </tr>

@@ -17,7 +17,7 @@ type LineTrendChartProps = {
   xKey: string;
   yKey: string;
   stroke: string;
-  formatter?: (value: number) => string;
+  format?: "percentage" | "score" | "raw";
 };
 
 export function LineTrendChart({
@@ -25,14 +25,20 @@ export function LineTrendChart({
   xKey,
   yKey,
   stroke,
-  formatter,
+  format = "raw",
 }: LineTrendChartProps) {
   const gradientId = `gradient-${yKey}`;
+
+  const fmt = (value: number): string => {
+    if (format === "percentage") return `${(value * 100).toFixed(1)}%`;
+    if (format === "score") return `${value.toFixed(0)}/100`;
+    return String(value);
+  };
 
   const formatValue = (value: TooltipValue) => {
     const candidate = Array.isArray(value) ? value[0] : value;
     const numericValue = typeof candidate === "number" ? candidate : Number(candidate ?? 0);
-    return formatter ? formatter(numericValue) : numericValue.toString();
+    return fmt(numericValue);
   };
 
   return (
@@ -58,9 +64,7 @@ export function LineTrendChart({
             tickLine={false}
             axisLine={false}
             fontSize={12}
-            tickFormatter={(value: number) =>
-              formatter ? formatter(value) : String(value)
-            }
+            tickFormatter={(value: number) => fmt(value)}
           />
           <Tooltip
             formatter={(value) => formatValue(value)}

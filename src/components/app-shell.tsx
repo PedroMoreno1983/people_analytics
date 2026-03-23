@@ -59,14 +59,14 @@ export function AppShell({ children }: PropsWithChildren) {
             <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-indigo-400">
                 <Activity className="size-3.5" />
-                Analytics coverage
+                Cobertura analítica
               </div>
               <ul className="mt-3 space-y-1.5 text-xs text-slate-400">
                 {[
-                  "Attrition & burnout risk scoring",
-                  "Department health heatmap",
-                  "Turnover and engagement trends",
-                  "CSV / XLSX data ingestion",
+                  "Scoring de riesgo de rotación y burnout",
+                  "Mapa de calor de salud departamental",
+                  "Tendencias de rotación y engagement",
+                  "Ingesta de datos CSV / XLSX",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2">
                     <div className="h-1 w-1 rounded-full bg-indigo-400" />

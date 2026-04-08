@@ -49,7 +49,7 @@ export function GlobalFilters() {
     <div className="relative mb-6">
       <div className="flex items-center justify-between">
         <Button 
-          variant="outline" 
+          variant="secondary" 
           size="sm" 
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 border-indigo-200 bg-white/50 text-indigo-900 shadow-sm backdrop-blur-md hover:bg-white/80"

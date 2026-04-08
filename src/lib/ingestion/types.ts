@@ -1,6 +1,11 @@
 import type { DatasetField } from "@/lib/ingestion/datasets";
 import type { DatasetKey } from "@/lib/validations/ingestion";
 
+export type ImportAnalyticsStatus = {
+  status: "ok" | "warning";
+  message: string;
+};
+
 export type PreviewResponse = {
   dataset: DatasetKey;
   fileName: string;
@@ -26,4 +31,5 @@ export type ImportResponse = {
   createdCount: number;
   updatedCount: number;
   message: string;
+  analytics?: ImportAnalyticsStatus;
 };

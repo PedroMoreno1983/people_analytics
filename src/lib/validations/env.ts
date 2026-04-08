@@ -1,10 +1,19 @@
 import { z } from "zod";
 
+const optionalString = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim().length === 0 ? undefined : value,
+  z.string().min(1).optional(),
+);
+
 const envSchema = z.object({
   DATABASE_URL: z.string().startsWith("postgresql://"),
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default("DataWise People Analytics"),
-  BASIC_AUTH_USERNAME: z.string().min(1).optional(),
-  BASIC_AUTH_PASSWORD: z.string().min(1).optional(),
+  BASIC_AUTH_USERNAME: optionalString,
+  BASIC_AUTH_PASSWORD: optionalString,
+  ENABLE_DEMO_MODE: z.enum(["true", "false"]).optional(),
+  OPENAI_API_KEY: optionalString,
+  OPENAI_MODEL: optionalString,
 });
 
 export function getEnvStatus() {
@@ -13,6 +22,9 @@ export function getEnvStatus() {
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     BASIC_AUTH_USERNAME: process.env.BASIC_AUTH_USERNAME,
     BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD,
+    ENABLE_DEMO_MODE: process.env.ENABLE_DEMO_MODE,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_MODEL: process.env.OPENAI_MODEL,
   });
 }
 
@@ -22,5 +34,12 @@ export function getValidatedEnv() {
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     BASIC_AUTH_USERNAME: process.env.BASIC_AUTH_USERNAME,
     BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD,
+    ENABLE_DEMO_MODE: process.env.ENABLE_DEMO_MODE,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_MODEL: process.env.OPENAI_MODEL,
   });
+}
+
+export function isDemoModeEnabled() {
+  return process.env.ENABLE_DEMO_MODE === "true";
 }

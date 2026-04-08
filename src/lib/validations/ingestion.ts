@@ -145,7 +145,7 @@ export const surveyImportRowSchema = z.object({
   surveyCreatedAt: optionalDateInput,
   employeeExternalCode: requiredString,
   dimension: requiredString,
-  score: numberInput,
+  score: numberInput.pipe(z.number().min(0).max(100)),
 });
 
 export const ingestionRowSchemas = {

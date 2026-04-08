@@ -23,7 +23,7 @@ function parseMapping(value: FormDataEntryValue | null) {
   try {
     return JSON.parse(value) as Record<string, string>;
   } catch {
-    throw new Error("Column mapping is not valid JSON.");
+    throw new Error("El mapeo de columnas no es un JSON válido.");
   }
 }
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     if (!(fileEntry instanceof File)) {
       return NextResponse.json(
-        { error: "Attach a CSV or XLSX file before importing." },
+        { error: "Adjunta un archivo CSV o XLSX antes de importar." },
         { status: 400 },
       );
     }
@@ -59,16 +59,37 @@ export async function POST(request: Request) {
           ? String(formData.get("companyName"))
           : undefined,
     });
-    await runAnalyticsPipeline({
-      companyId: result.companyId,
-    });
+    try {
+      await runAnalyticsPipeline({
+        companyId: result.companyId,
+      });
 
-    return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        analytics: {
+          status: "ok",
+          message: "Analytics se actualizó para esta empresa.",
+        },
+      });
+    } catch (analyticsError) {
+      const analyticsMessage =
+        analyticsError instanceof Error
+          ? analyticsError.message
+          : "La actualización de analytics falló después de terminar la importación.";
+
+      return NextResponse.json({
+        ...result,
+        analytics: {
+          status: "warning",
+          message: analyticsMessage,
+        },
+      });
+    }
   } catch (error) {
     if (error instanceof IngestionValidationError) {
       return NextResponse.json(
         {
-          error: "Import validation failed.",
+          error: "La validación de la importación falló.",
           details: error.issues,
         },
         { status: 422 },
@@ -78,7 +99,7 @@ export async function POST(request: Request) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
-          error: "Import payload is invalid.",
+          error: "El payload de importación no es válido.",
           details: error.flatten().fieldErrors,
         },
         { status: 400 },
@@ -86,7 +107,7 @@ export async function POST(request: Request) {
     }
 
     const message =
-      error instanceof Error ? error.message : "Could not import the uploaded data.";
+      error instanceof Error ? error.message : "No pudimos importar los datos cargados.";
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

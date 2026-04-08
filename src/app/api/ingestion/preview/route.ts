@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     if (!(fileEntry instanceof File)) {
       return NextResponse.json(
-        { error: "Attach a CSV or XLSX file before previewing." },
+        { error: "Adjunta un archivo CSV o XLSX antes de previsualizar." },
         { status: 400 },
       );
     }
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
-          error: "Preview payload is invalid.",
+          error: "El payload de la vista previa no es válido.",
           details: error.flatten().fieldErrors,
         },
         { status: 400 },
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     }
 
     const message =
-      error instanceof Error ? error.message : "Could not generate preview.";
+      error instanceof Error ? error.message : "No pudimos generar la vista previa.";
 
     return NextResponse.json({ error: message }, { status: 400 });
   }

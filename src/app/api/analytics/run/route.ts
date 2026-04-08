@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { ZodError, z } from "zod";
 
 import { runAnalyticsPipeline } from "@/lib/analytics/pipeline";
 
@@ -24,6 +24,16 @@ export async function POST(request: Request) {
       results,
     });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          error: "Analytics payload is invalid.",
+          details: error.flatten().fieldErrors,
+        },
+        { status: 400 },
+      );
+    }
+
     const message =
       error instanceof Error ? error.message : "Could not run analytics pipeline.";
 

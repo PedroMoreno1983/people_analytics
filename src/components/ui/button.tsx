@@ -8,9 +8,9 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200 focus-visible:ring-indigo-500",
-        secondary: "border border-slate-200 bg-white text-slate-900 hover:border-slate-300 hover:bg-slate-50 focus-visible:ring-slate-400",
-        ghost: "text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-400"
+        default: "bg-indigo-600 !text-white hover:bg-indigo-700 hover:!text-white shadow-md shadow-indigo-200 focus-visible:ring-indigo-500",
+        secondary: "border border-slate-200 bg-white !text-slate-900 hover:border-slate-300 hover:bg-slate-50 hover:!text-slate-900 focus-visible:ring-slate-400",
+        ghost: "!text-slate-700 hover:bg-slate-100 hover:!text-slate-700 focus-visible:ring-slate-400"
       },
       size: {
         default: "h-11 px-5",

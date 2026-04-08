@@ -20,6 +20,7 @@ import {
   computeWorkloadRisk,
   normalizeFivePointToPositivePercentage,
 } from "@/lib/analytics/scoring";
+import { normalizeSurveyDimension } from "@/lib/analytics/survey";
 import type { AnalyticsRunResult } from "@/lib/analytics/types";
 import { prisma } from "@/lib/prisma";
 
@@ -82,10 +83,12 @@ function getLatestSurveyScore(
   dimension: string,
   monthEnd: Date,
 ) {
+  const normalizedDimension = normalizeSurveyDimension(dimension);
   const latestResponse = employee.surveyResponses
     .filter(
       (response) =>
-        response.dimension === dimension && response.survey.createdAt <= monthEnd,
+        normalizeSurveyDimension(response.dimension) === normalizedDimension &&
+        response.survey.createdAt <= monthEnd,
     )
     .sort(
       (left, right) =>

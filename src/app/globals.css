@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f0f4ff;
+  --background: #eef1fb;
   --foreground: #0f172a;
-  --border: rgba(148, 163, 184, 0.25);
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
+  --border: rgba(148, 163, 184, 0.2);
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
 }
 
 @theme inline {
@@ -27,12 +27,31 @@ html {
 
 body {
   min-height: 100vh;
-  background: var(--background);
+  background:
+    radial-gradient(ellipse at 15% 40%, rgba(99, 102, 241, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 85%, rgba(59, 130, 246, 0.07) 0%, transparent 50%),
+    #eef1fb;
   color: var(--foreground);
   font-family: var(--font-sans);
 }
 
 a {
-  color: inherit;
   text-decoration: none;
+}
+
+/* Scrollbar elegante */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.45);
 }

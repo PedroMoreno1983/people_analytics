@@ -1,4 +1,8 @@
 import { monthsDiff } from "@/lib/analytics/date";
+import {
+  normalizeSurveyPositivePercentage,
+  normalizeSurveyRiskPercentage,
+} from "@/lib/analytics/survey";
 
 export type AttritionInputs = {
   absenteeism: number;
@@ -24,20 +28,8 @@ export function clampScore(value: number, min = 0, max = 100) {
   return Math.min(Math.max(value, min), max);
 }
 
-function normalizeInverseFivePointScale(score: number | null | undefined) {
-  if (score == null) {
-    return 50;
-  }
-
-  return clampScore(((5 - score) / 4) * 100);
-}
-
 export function normalizeFivePointToPositivePercentage(score: number | null | undefined) {
-  if (score == null) {
-    return 50;
-  }
-
-  return clampScore((score / 5) * 100);
+  return clampScore(normalizeSurveyPositivePercentage(score));
 }
 
 export function computeAbsenteeismRisk(absenceDaysLast90: number) {
@@ -106,15 +98,15 @@ export function computePromotionGapRisk(
 }
 
 export function computeLowEngagementRisk(score: number | null | undefined) {
-  return normalizeInverseFivePointScale(score);
+  return clampScore(normalizeSurveyRiskPercentage(score));
 }
 
 export function computeWorkloadRisk(score: number | null | undefined) {
-  return normalizeInverseFivePointScale(score);
+  return clampScore(normalizeSurveyRiskPercentage(score));
 }
 
 export function computeStressFeedbackRisk(score: number | null | undefined) {
-  return normalizeInverseFivePointScale(score);
+  return clampScore(normalizeSurveyRiskPercentage(score));
 }
 
 function sortDrivers(contributions: WeightedContribution[]) {

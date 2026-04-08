@@ -3,24 +3,24 @@ import { getDepartmentHealth } from "@/lib/analytics/health";
 import { riskBand } from "@/lib/analytics/scoring";
 import type { DepartmentDashboard } from "@/lib/analytics/types";
 import { prisma } from "@/lib/prisma";
-
-export async function getDepartmentDashboard(companyId?: string): Promise<DepartmentDashboard | null> {
-  try {
-    return await getDepartmentDashboardFromDB(companyId);
-  } catch {
-    return getDemoDepartmentDashboard();
-  }
-}
+import { isDemoModeEnabled } from "@/lib/validations/env";
 
 function getDemoDepartmentDashboard(): DepartmentDashboard {
-  const months = ["2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02"];
+  const months = [
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+  ];
   const makeTrends = (base: { t: number; e: number; b: number; a: number }) =>
-    months.map((month, i) => ({
+    months.map((month, index) => ({
       month,
-      turnoverRate: Number((base.t + i * 0.002).toFixed(4)),
-      engagementScore: Number((base.e - i * 0.3).toFixed(2)),
-      burnoutRiskAvg: Number((base.b + i * 0.5).toFixed(2)),
-      attritionRiskAvg: Number((base.a + i * 0.8).toFixed(2)),
+      turnoverRate: Number((base.t + index * 0.002).toFixed(4)),
+      engagementScore: Number((base.e - index * 0.3).toFixed(2)),
+      burnoutRiskAvg: Number((base.b + index * 0.5).toFixed(2)),
+      attritionRiskAvg: Number((base.a + index * 0.8).toFixed(2)),
       headcount: 40,
     }));
 
@@ -29,73 +29,127 @@ function getDemoDepartmentDashboard(): DepartmentDashboard {
     companyName: "Acme Corp (Demo)",
     departments: [
       {
-        departmentId: "d1", name: "Ventas", latestMonth: "2026-02",
-        health: "En Riesgo", tone: "critical",
-        headcount: 45, turnoverRate: 0.08, absenteeismRate: 0.03,
-        engagementScore: 62, burnoutRiskAvg: 49, attritionRiskAvg: 68,
-        topDrivers: ["Alta rotación", "Burnout elevado", "Bajo engagement"],
+        departmentId: "d1",
+        name: "Ventas",
+        latestMonth: "2026-02",
+        health: "En Riesgo",
+        tone: "critical",
+        headcount: 45,
+        turnoverRate: 0.08,
+        absenteeismRate: 0.03,
+        engagementScore: 62,
+        burnoutRiskAvg: 49,
+        attritionRiskAvg: 68,
+        topDrivers: ["Alta rotacion", "Burnout elevado", "Bajo engagement"],
         trends: makeTrends({ t: 0.06, e: 65, b: 42, a: 55 }),
-        insights: ["La rotación está materialmente por encima del promedio de la empresa.", "2 empleados están en riesgo alto de rotación en el último mes de scoring."],
+        insights: [
+          "La rotacion esta materialmente por encima del promedio de la empresa.",
+          "2 empleados estan en riesgo alto de rotacion en el último mes de scoring.",
+        ],
       },
       {
-        departmentId: "d3", name: "Operaciones", latestMonth: "2026-02",
-        health: "En Alerta", tone: "warning",
-        headcount: 38, turnoverRate: 0.05, absenteeismRate: 0.025,
-        engagementScore: 67, burnoutRiskAvg: 41, attritionRiskAvg: 45,
+        departmentId: "d3",
+        name: "Operaciones",
+        latestMonth: "2026-02",
+        health: "En Alerta",
+        tone: "warning",
+        headcount: 38,
+        turnoverRate: 0.05,
+        absenteeismRate: 0.025,
+        engagementScore: 67,
+        burnoutRiskAvg: 41,
+        attritionRiskAvg: 45,
         topDrivers: ["Ausentismo elevado", "Engagement bajo"],
         trends: makeTrends({ t: 0.04, e: 70, b: 36, a: 38 }),
-        insights: ["El engagement de Operaciones está por debajo del umbral ejecutivo."],
+        insights: [
+          "El engagement de Operaciones esta por debajo del umbral ejecutivo.",
+        ],
       },
       {
-        departmentId: "d6", name: "Finanzas", latestMonth: "2026-02",
-        health: "En Alerta", tone: "warning",
-        headcount: 20, turnoverRate: 0.045, absenteeismRate: 0.02,
-        engagementScore: 69, burnoutRiskAvg: 38, attritionRiskAvg: 41,
+        departmentId: "d6",
+        name: "Finanzas",
+        latestMonth: "2026-02",
+        health: "En Alerta",
+        tone: "warning",
+        headcount: 20,
+        turnoverRate: 0.045,
+        absenteeismRate: 0.02,
+        engagementScore: 69,
+        burnoutRiskAvg: 38,
+        attritionRiskAvg: 41,
         topDrivers: ["Carga de trabajo"],
         trends: makeTrends({ t: 0.035, e: 72, b: 33, a: 35 }),
-        insights: ["Finanzas no presenta alertas críticas pero merece seguimiento."],
+        insights: ["Finanzas no presenta alertas criticas pero merece seguimiento."],
       },
       {
-        departmentId: "d7", name: "Marketing", latestMonth: "2026-02",
-        health: "Estable", tone: "positive",
-        headcount: 20, turnoverRate: 0.035, absenteeismRate: 0.018,
-        engagementScore: 73, burnoutRiskAvg: 35, attritionRiskAvg: 33,
+        departmentId: "d7",
+        name: "Marketing",
+        latestMonth: "2026-02",
+        health: "Estable",
+        tone: "positive",
+        headcount: 20,
+        turnoverRate: 0.035,
+        absenteeismRate: 0.018,
+        engagementScore: 73,
+        burnoutRiskAvg: 35,
+        attritionRiskAvg: 33,
         topDrivers: [],
         trends: makeTrends({ t: 0.03, e: 74, b: 32, a: 30 }),
         insights: ["Marketing no presenta alertas agudas en el último mes de scoring."],
       },
       {
-        departmentId: "d5", name: "Producto", latestMonth: "2026-02",
-        health: "Estable", tone: "positive",
-        headcount: 31, turnoverRate: 0.03, absenteeismRate: 0.015,
-        engagementScore: 75, burnoutRiskAvg: 32, attritionRiskAvg: 30,
+        departmentId: "d5",
+        name: "Producto",
+        latestMonth: "2026-02",
+        health: "Estable",
+        tone: "positive",
+        headcount: 31,
+        turnoverRate: 0.03,
+        absenteeismRate: 0.015,
+        engagementScore: 75,
+        burnoutRiskAvg: 32,
+        attritionRiskAvg: 30,
         topDrivers: [],
         trends: makeTrends({ t: 0.025, e: 76, b: 29, a: 27 }),
         insights: ["Producto no presenta alertas agudas en el último mes de scoring."],
       },
       {
-        departmentId: "d4", name: "People Ops", latestMonth: "2026-02",
-        health: "Saludable", tone: "positive",
-        headcount: 22, turnoverRate: 0.02, absenteeismRate: 0.01,
-        engagementScore: 79, burnoutRiskAvg: 24, attritionRiskAvg: 18,
+        departmentId: "d4",
+        name: "People Ops",
+        latestMonth: "2026-02",
+        health: "Saludable",
+        tone: "positive",
+        headcount: 22,
+        turnoverRate: 0.02,
+        absenteeismRate: 0.01,
+        engagementScore: 79,
+        burnoutRiskAvg: 24,
+        attritionRiskAvg: 18,
         topDrivers: [],
         trends: makeTrends({ t: 0.018, e: 80, b: 22, a: 16 }),
-        insights: ["People Ops es el equipo de referencia para engagement y retención."],
+        insights: ["People Ops es el equipo de referencia en engagement y retención."],
       },
       {
-        departmentId: "d2", name: "Ingeniería", latestMonth: "2026-02",
-        health: "Saludable", tone: "positive",
-        headcount: 72, turnoverRate: 0.02, absenteeismRate: 0.01,
-        engagementScore: 81, burnoutRiskAvg: 28, attritionRiskAvg: 22,
+        departmentId: "d2",
+        name: "Ingenieria",
+        latestMonth: "2026-02",
+        health: "Saludable",
+        tone: "positive",
+        headcount: 72,
+        turnoverRate: 0.02,
+        absenteeismRate: 0.01,
+        engagementScore: 81,
+        burnoutRiskAvg: 28,
+        attritionRiskAvg: 22,
         topDrivers: [],
         trends: makeTrends({ t: 0.018, e: 82, b: 25, a: 20 }),
-        insights: ["Ingeniería no presenta alertas agudas en el último mes de scoring."],
+        insights: ["Ingenieria no presenta alertas agudas en el último mes de scoring."],
       },
     ],
   };
 }
 
-async function getDepartmentDashboardFromDB(companyId?: string) {
+async function getDepartmentDashboardFromDb(companyId?: string) {
   const company = companyId
     ? await prisma.company.findUnique({
         where: { id: companyId },
@@ -152,7 +206,7 @@ async function getDepartmentDashboardFromDB(companyId?: string) {
     orderBy: [{ scoringDate: "desc" }],
   });
 
-  const dashboard = {
+  return {
     companyId: company.id,
     companyName: company.name,
     departments: departmentIds
@@ -182,6 +236,7 @@ async function getDepartmentDashboardFromDB(companyId?: string) {
             .forEach((driver) => {
               map.set(driver, (map.get(driver) ?? 0) + 1);
             });
+
           return map;
         }, new Map<string, number>());
         const topDrivers = Array.from(driverCounts.entries())
@@ -194,10 +249,10 @@ async function getDepartmentDashboardFromDB(companyId?: string) {
         const health = getDepartmentHealth(latestMetric);
         const insights = [
           latestMetric.turnoverRate > 0.06
-            ? `La rotación está materialmente elevada en ${latestMetric.department.name}.`
+            ? `La rotacion esta materialmente elevada en ${latestMetric.department.name}.`
             : null,
           latestMetric.engagementScore < 70
-            ? `El engagement de ${latestMetric.department.name} está por debajo del umbral ejecutivo.`
+            ? `El engagement de ${latestMetric.department.name} esta por debajo del umbral ejecutivo.`
             : null,
           highRiskCount > 0
             ? `${highRiskCount} empleados están en riesgo alto de rotación en el último mes de scoring.`
@@ -206,7 +261,7 @@ async function getDepartmentDashboardFromDB(companyId?: string) {
 
         if (insights.length === 0) {
           insights.push(
-            `${latestMetric.department.name} no presenta alertas agudas en el último mes de scoring.`,
+            `${latestMetric.department.name} no presenta alertas agudas en el último mes analizado.`,
           );
         }
 
@@ -233,10 +288,15 @@ async function getDepartmentDashboardFromDB(companyId?: string) {
           insights,
         };
       })
-      .filter((department): department is NonNullable<typeof department> => Boolean(department))
+      .filter(
+        (department): department is NonNullable<typeof department> =>
+          Boolean(department),
+      )
       .sort((left, right) => {
-        const leftSeverity = left.tone === "critical" ? 2 : left.tone === "warning" ? 1 : 0;
-        const rightSeverity = right.tone === "critical" ? 2 : right.tone === "warning" ? 1 : 0;
+        const leftSeverity =
+          left.tone === "critical" ? 2 : left.tone === "warning" ? 1 : 0;
+        const rightSeverity =
+          right.tone === "critical" ? 2 : right.tone === "warning" ? 1 : 0;
 
         if (leftSeverity !== rightSeverity) {
           return rightSeverity - leftSeverity;
@@ -245,7 +305,24 @@ async function getDepartmentDashboardFromDB(companyId?: string) {
         return right.attritionRiskAvg - left.attritionRiskAvg;
       }),
   } satisfies DepartmentDashboard;
-
-  return dashboard;
 }
 
+export async function getDepartmentDashboard(
+  companyId?: string,
+): Promise<DepartmentDashboard | null> {
+  try {
+    const dashboard = await getDepartmentDashboardFromDb(companyId);
+
+    if (!dashboard && isDemoModeEnabled()) {
+      return getDemoDepartmentDashboard();
+    }
+
+    return dashboard;
+  } catch (error) {
+    if (isDemoModeEnabled()) {
+      return getDemoDepartmentDashboard();
+    }
+
+    throw error;
+  }
+}

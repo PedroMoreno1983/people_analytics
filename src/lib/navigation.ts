@@ -11,20 +11,20 @@ export type NavigationItem = {
 export const navigationItems: NavigationItem[] = [
   {
     href: "/dashboard",
-    label: "Dashboard Ejecutivo",
-    description: "Salud organizacional, distribución de riesgo y tendencias clave.",
-    icon: BarChart3
+    label: "Resumen Ejecutivo",
+    description: "Qué está pasando hoy, qué cambió y dónde mirar primero.",
+    icon: BarChart3,
   },
   {
     href: "/departments",
-    label: "Departamentos",
-    description: "Salud, factores de riesgo y métricas operativas por departamento.",
-    icon: Building2
+    label: "Equipos",
+    description: "Lectura por área, factores principales y siguientes conversaciones.",
+    icon: Building2,
   },
   {
     href: "/upload",
-    label: "Ingesta de Datos",
-    description: "Subí archivos CSV/XLSX para actualizar el pipeline de analytics.",
-    icon: Upload
-  }
+    label: "Carga de Datos",
+    description: "Sube archivos, revisa columnas y guarda con contexto.",
+    icon: Upload,
+  },
 ];

@@ -15,7 +15,7 @@ export function getDepartmentHealth(entry: {
     entry.burnoutRiskAvg >= 60 ||
     entry.engagementScore < 60
   ) {
-    return { health: "At Risk", tone: "critical" };
+    return { health: "En riesgo", tone: "critical" };
   }
 
   if (
@@ -23,8 +23,8 @@ export function getDepartmentHealth(entry: {
     entry.burnoutRiskAvg >= 40 ||
     entry.engagementScore < 72
   ) {
-    return { health: "Watch", tone: "warning" };
+    return { health: "Seguimiento", tone: "warning" };
   }
 
-  return { health: "Healthy", tone: "positive" };
+  return { health: "Saludable", tone: "positive" };
 }

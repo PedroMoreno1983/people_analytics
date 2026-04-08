@@ -1,6 +1,7 @@
 import type { Company, Prisma, PrismaClient, Survey } from "@prisma/client";
 import { ZodError } from "zod";
 
+import { normalizeSurveyDimension } from "@/lib/analytics/survey";
 import { getDatasetDefinition } from "@/lib/ingestion/datasets";
 import type { ParsedUpload } from "@/lib/ingestion/file-parser";
 import type { ImportIssue, ImportResponse, PreviewResponse } from "@/lib/ingestion/types";
@@ -63,7 +64,7 @@ const HEADER_SYNONYMS: Record<DatasetKey, Record<string, string[]>> = {
 
 export class IngestionValidationError extends Error {
   constructor(public readonly issues: ImportIssue[]) {
-    super("Import validation failed.");
+    super("La validación de la importación falló.");
   }
 }
 
@@ -145,7 +146,7 @@ async function resolveCompany(
         {
           rowNumber: 0,
           field: "companyId",
-          message: "Selected company was not found.",
+          message: "No encontramos la empresa seleccionada.",
         },
       ]);
     }
@@ -167,7 +168,7 @@ async function resolveCompany(
       {
         rowNumber: 0,
         field: "companyName",
-        message: "Company does not exist yet. Import employees first or select an existing company.",
+        message: "La empresa todavía no existe. Importa empleados primero o selecciona una empresa existente.",
       },
     ]);
   }
@@ -250,7 +251,7 @@ async function importEmployees(
       missingManagerCodes.map((managerCode) => ({
         rowNumber: 0,
         field: "managerExternalCode",
-        message: `Manager ${managerCode} does not exist in the file or in the selected company.`,
+        message: `El manager ${managerCode} no existe en el archivo ni en la empresa seleccionada.`,
       })),
     );
   }
@@ -266,7 +267,7 @@ async function importEmployees(
         {
           rowNumber: 0,
           field: "departmentName",
-          message: `Department ${row.departmentName} could not be resolved.`,
+          message: `No pudimos resolver el área o equipo ${row.departmentName}.`,
         },
       ]);
     }
@@ -275,6 +276,7 @@ async function importEmployees(
     const data = {
       companyId: company.id,
       departmentId: department.id,
+      managerId: null,
       externalCode: String(row.externalCode),
       firstName: row.firstName ? String(row.firstName) : null,
       lastName: row.lastName ? String(row.lastName) : null,
@@ -341,7 +343,7 @@ async function importEmployees(
     importedCount: typedRows.length,
     createdCount,
     updatedCount,
-    message: `Imported ${typedRows.length} employees into ${company.name}.`,
+    message: `Importamos ${typedRows.length} empleados en ${company.name}.`,
   } satisfies ImportSummary;
 }
 
@@ -374,7 +376,7 @@ async function resolveEmployeesByExternalCode(
       missingCodes.map((code) => ({
         rowNumber: 0,
         field: "employeeExternalCode",
-        message: `Employee ${code} was not found in the selected company.`,
+        message: `No encontramos al empleado ${code} en la empresa seleccionada.`,
       })),
     );
   }
@@ -431,7 +433,7 @@ async function importAbsences(
     importedCount: typedRows.length,
     createdCount,
     updatedCount: 0,
-    message: `Imported ${createdCount} new absence events into ${company.name}.`,
+    message: `Importamos ${createdCount} nuevos eventos de ausencia en ${company.name}.`,
   } satisfies ImportSummary;
 }
 
@@ -491,7 +493,7 @@ async function importPerformance(
     importedCount: typedRows.length,
     createdCount,
     updatedCount,
-    message: `Imported ${typedRows.length} performance review records into ${company.name}.`,
+    message: `Importamos ${typedRows.length} registros de performance en ${company.name}.`,
   } satisfies ImportSummary;
 }
 
@@ -548,6 +550,7 @@ async function importSurveys(
   for (const row of typedRows) {
     const surveyKey = `${row.surveyName}::${row.surveyCreatedAt?.toISOString() ?? "latest"}`;
     let surveyPromise = surveyCache.get(surveyKey);
+    const normalizedDimension = normalizeSurveyDimension(row.dimension);
 
     if (!surveyPromise) {
       surveyPromise = resolveSurvey(tx, company.id, row.surveyName, row.surveyCreatedAt);
@@ -556,18 +559,21 @@ async function importSurveys(
 
     const survey = await surveyPromise;
     const employee = employeeMap.get(row.employeeExternalCode)!;
-    const existingResponse = await tx.surveyResponse.findFirst({
+    const existingResponses = await tx.surveyResponse.findMany({
       where: {
         surveyId: survey.id,
         employeeId: employee.id,
-        dimension: row.dimension,
       },
     });
+    const existingResponse = existingResponses.find(
+      (response) => normalizeSurveyDimension(response.dimension) === normalizedDimension,
+    );
 
     if (existingResponse) {
       await tx.surveyResponse.update({
         where: { id: existingResponse.id },
         data: {
+          dimension: normalizedDimension,
           score: row.score,
         },
       });
@@ -579,7 +585,7 @@ async function importSurveys(
       data: {
         surveyId: survey.id,
         employeeId: employee.id,
-        dimension: row.dimension,
+        dimension: normalizedDimension,
         score: row.score,
       },
     });
@@ -590,7 +596,7 @@ async function importSurveys(
     importedCount: typedRows.length,
     createdCount,
     updatedCount,
-    message: `Imported ${typedRows.length} survey response records into ${company.name}.`,
+    message: `Importamos ${typedRows.length} respuestas de encuestas en ${company.name}.`,
   } satisfies ImportSummary;
 }
 
@@ -638,7 +644,7 @@ export async function importFromParsedUpload(input: {
       missingRequiredMappings.map((fieldKey) => ({
         rowNumber: 0,
         field: fieldKey,
-        message: `Map the required field ${fieldKey} before importing.`,
+        message: `Mapea el campo obligatorio ${fieldKey} antes de importar.`,
       })),
     );
   }
@@ -652,7 +658,7 @@ export async function importFromParsedUpload(input: {
       unknownHeaders.map((header) => ({
         rowNumber: 0,
         field: header,
-        message: "Mapped header does not exist in the uploaded file.",
+        message: "El encabezado mapeado no existe en el archivo cargado.",
       })),
     );
   }
@@ -682,7 +688,7 @@ export async function importFromParsedUpload(input: {
       {
         rowNumber: 0,
         field: "file",
-        message: "The uploaded file does not contain any data rows to import.",
+        message: "El archivo cargado no contiene filas de datos para importar.",
       },
     ]);
   }

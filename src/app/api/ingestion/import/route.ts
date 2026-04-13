@@ -6,6 +6,7 @@ import {
   parseUploadedFile,
 } from "@/lib/ingestion/file-parser";
 import { runAnalyticsPipeline } from "@/lib/analytics/pipeline";
+import { ensureApiUser } from "@/lib/auth/api";
 import { IngestionValidationError, importFromParsedUpload } from "@/lib/ingestion/service";
 import { datasetSchema, fileTypeSchema } from "@/lib/validations/ingestion";
 
@@ -29,6 +30,12 @@ function parseMapping(value: FormDataEntryValue | null) {
 
 export async function POST(request: Request) {
   try {
+    const auth = await ensureApiUser();
+
+    if (auth.response) {
+      return auth.response;
+    }
+
     const formData = await request.formData();
     const fileEntry = formData.get("file");
 

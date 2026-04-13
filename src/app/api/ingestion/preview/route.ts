@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
+import { ensureApiUser } from "@/lib/auth/api";
 import {
   inferFileTypeFromName,
   parseUploadedFile,
@@ -16,6 +17,12 @@ function toBoolean(value: FormDataEntryValue | null) {
 
 export async function POST(request: Request) {
   try {
+    const auth = await ensureApiUser();
+
+    if (auth.response) {
+      return auth.response;
+    }
+
     const formData = await request.formData();
     const fileEntry = formData.get("file");
 

@@ -12,9 +12,11 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "analytics:run": "tsx scripts/run-analytics.ts"
+    "analytics:run": "tsx scripts/run-analytics.ts",
+    "auth:bootstrap": "tsx scripts/bootstrap-auth.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",

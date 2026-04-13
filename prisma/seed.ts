@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 import { runAnalyticsPipeline } from "../src/lib/analytics/pipeline";
+import { upsertBootstrapUser } from "../src/lib/auth/bootstrap";
 
 const prisma = new PrismaClient();
 
@@ -260,6 +261,8 @@ async function main() {
     companyId: company.id,
     prismaClient: prisma,
   });
+
+  await upsertBootstrapUser();
 
   console.log("Seed completed for DataWise People Analytics.");
 }

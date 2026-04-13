@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError, z } from "zod";
 
+import { ensureApiUser } from "@/lib/auth/api";
 import { buildCopilotReply } from "@/lib/copilot/service";
 
 export const runtime = "nodejs";
@@ -19,6 +20,12 @@ const copilotRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const auth = await ensureApiUser();
+
+    if (auth.response) {
+      return auth.response;
+    }
+
     const body = request.headers.get("content-type")?.includes("application/json")
       ? await request.json()
       : {};

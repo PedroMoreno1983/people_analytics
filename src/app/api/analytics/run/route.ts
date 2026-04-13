@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError, z } from "zod";
 
 import { runAnalyticsPipeline } from "@/lib/analytics/pipeline";
+import { ensureApiUser } from "@/lib/auth/api";
 
 export const runtime = "nodejs";
 
@@ -11,6 +12,12 @@ const analyticsRunRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const auth = await ensureApiUser();
+
+    if (auth.response) {
+      return auth.response;
+    }
+
     const body = request.headers.get("content-type")?.includes("application/json")
       ? await request.json()
       : {};

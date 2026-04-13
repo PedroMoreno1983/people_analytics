@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
+import { ensureApiUser } from "@/lib/auth/api";
 import {
   getDatasetDefinition,
   getTemplateExampleRow,
@@ -18,6 +19,12 @@ function escapeCsvValue(value: string) {
 
 export async function GET(request: Request) {
   try {
+    const auth = await ensureApiUser();
+
+    if (auth.response) {
+      return auth.response;
+    }
+
     const url = new URL(request.url);
     const dataset = datasetSchema.parse(url.searchParams.get("dataset"));
     const definition = getDatasetDefinition(dataset);

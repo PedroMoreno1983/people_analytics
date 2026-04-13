@@ -1,61 +1,54 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = [
-  "/dashboard",
-  "/departments",
-  "/people",
-  "/upload",
-  "/api/analytics",
-  "/api/ingestion",
-  "/api/copilot",
-];
+import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth/token";
 
-function decodeBase64(value: string) {
-  try {
-    return atob(value);
-  } catch {
-    return "";
-  }
+const APP_PROTECTED_PREFIXES = ["/dashboard", "/people", "/departments", "/upload"];
+const API_PROTECTED_PREFIXES = ["/api/analytics", "/api/ingestion", "/api/copilot"];
+
+function isProtectedPath(pathname: string) {
+  return (
+    APP_PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ||
+    API_PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  );
 }
 
-export function proxy(request: NextRequest) {
-  const username = process.env.BASIC_AUTH_USERNAME;
-  const password = process.env.BASIC_AUTH_PASSWORD;
+function isApiPath(pathname: string) {
+  return API_PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
 
-  if (!username || !password) {
+function buildLoginUrl(request: NextRequest) {
+  const loginUrl = new URL("/login", request.url);
+  const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+
+  if (nextPath && nextPath !== "/") {
+    loginUrl.searchParams.set("next", nextPath);
+  }
+
+  return loginUrl;
+}
+
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (!isProtectedPath(pathname)) {
     return NextResponse.next();
   }
 
-  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
-    request.nextUrl.pathname.startsWith(prefix),
-  );
+  const sessionToken = request.cookies.get(AUTH_COOKIE_NAME)?.value;
 
-  if (!isProtected) {
-    return NextResponse.next();
+  if (!sessionToken) {
+    return isApiPath(pathname)
+      ? NextResponse.json({ error: "Authentication required." }, { status: 401 })
+      : NextResponse.redirect(buildLoginUrl(request));
   }
 
-  const authorization = request.headers.get("authorization");
+  const sessionPayload = await verifySessionToken(sessionToken);
 
-  if (!authorization?.startsWith("Basic ")) {
-    return new NextResponse("Authentication required.", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": 'Basic realm="DataWise People Analytics"',
-      },
-    });
-  }
-
-  const decodedCredentials = decodeBase64(authorization.slice(6));
-  const [providedUsername, providedPassword] = decodedCredentials.split(":");
-
-  if (providedUsername !== username || providedPassword !== password) {
-    return new NextResponse("Invalid credentials.", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": 'Basic realm="DataWise People Analytics"',
-      },
-    });
+  if (!sessionPayload) {
+    return isApiPath(pathname)
+      ? NextResponse.json({ error: "Invalid session." }, { status: 401 })
+      : NextResponse.redirect(buildLoginUrl(request));
   }
 
   return NextResponse.next();
@@ -64,8 +57,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/departments/:path*",
     "/people/:path*",
+    "/departments/:path*",
     "/upload/:path*",
     "/api/analytics/:path*",
     "/api/ingestion/:path*",

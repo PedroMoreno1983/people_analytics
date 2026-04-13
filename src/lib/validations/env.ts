@@ -12,6 +12,10 @@ const envSchema = z.object({
   BASIC_AUTH_USERNAME: optionalString,
   BASIC_AUTH_PASSWORD: optionalString,
   ENABLE_DEMO_MODE: z.enum(["true", "false"]).optional(),
+  AUTH_SESSION_SECRET: optionalString,
+  AUTH_BOOTSTRAP_EMAIL: optionalString,
+  AUTH_BOOTSTRAP_PASSWORD: optionalString,
+  AUTH_BOOTSTRAP_NAME: optionalString,
   OPENAI_API_KEY: optionalString,
   OPENAI_MODEL: optionalString,
 });
@@ -23,6 +27,10 @@ export function getEnvStatus() {
     BASIC_AUTH_USERNAME: process.env.BASIC_AUTH_USERNAME,
     BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD,
     ENABLE_DEMO_MODE: process.env.ENABLE_DEMO_MODE,
+    AUTH_SESSION_SECRET: process.env.AUTH_SESSION_SECRET,
+    AUTH_BOOTSTRAP_EMAIL: process.env.AUTH_BOOTSTRAP_EMAIL,
+    AUTH_BOOTSTRAP_PASSWORD: process.env.AUTH_BOOTSTRAP_PASSWORD,
+    AUTH_BOOTSTRAP_NAME: process.env.AUTH_BOOTSTRAP_NAME,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     OPENAI_MODEL: process.env.OPENAI_MODEL,
   });
@@ -35,6 +43,10 @@ export function getValidatedEnv() {
     BASIC_AUTH_USERNAME: process.env.BASIC_AUTH_USERNAME,
     BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD,
     ENABLE_DEMO_MODE: process.env.ENABLE_DEMO_MODE,
+    AUTH_SESSION_SECRET: process.env.AUTH_SESSION_SECRET,
+    AUTH_BOOTSTRAP_EMAIL: process.env.AUTH_BOOTSTRAP_EMAIL,
+    AUTH_BOOTSTRAP_PASSWORD: process.env.AUTH_BOOTSTRAP_PASSWORD,
+    AUTH_BOOTSTRAP_NAME: process.env.AUTH_BOOTSTRAP_NAME,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     OPENAI_MODEL: process.env.OPENAI_MODEL,
   });

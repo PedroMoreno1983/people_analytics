@@ -138,10 +138,10 @@ export default function HomePage() {
 
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
-                href="/upload"
+                href="/login"
                 className="inline-flex items-center gap-2 rounded-full bg-cyan-500 px-6 py-3 text-sm font-semibold !text-slate-950 shadow-lg shadow-cyan-950/30 transition-colors hover:bg-cyan-400 hover:!text-slate-950"
               >
-                Empezar con datos reales
+                Entrar al workspace
                 <ArrowRight className="size-4" />
               </Link>
               <Link

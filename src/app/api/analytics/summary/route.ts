@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 
 import { getExecutiveSummary } from "@/lib/analytics/summary";
+import { ensureApiUser } from "@/lib/auth/api";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   try {
+    const auth = await ensureApiUser();
+
+    if (auth.response) {
+      return auth.response;
+    }
+
     const url = new URL(request.url);
     const companyId = url.searchParams.get("companyId") ?? undefined;
     const summary = await getExecutiveSummary(companyId);

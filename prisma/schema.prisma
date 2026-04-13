@@ -8,6 +8,12 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum AppUserRole {
+  ADMIN
+  ANALYST
+  VIEWER
+}
+
 model Company {
   id            String   @id @default(uuid())
   name          String
@@ -175,4 +181,36 @@ model TeamMetricsMonthly {
   @@index([departmentId])
   @@index([month])
   @@unique([departmentId, month])
+}
+
+model AppUser {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  name         String
+  role         AppUserRole  @default(ADMIN)
+  passwordHash String
+  passwordSalt String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  sessions     AppSession[]
+
+  @@index([email])
+}
+
+model AppSession {
+  id         String    @id @default(uuid())
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  revokedAt  DateTime?
+  userAgent  String?
+  ipAddress  String?
+
+  user       AppUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
 }

@@ -1,6 +1,5 @@
 import "server-only";
 
-import type { AppUser } from "@prisma/client";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -14,7 +13,12 @@ import {
 } from "@/lib/auth/token";
 import { prisma } from "@/lib/prisma";
 
-type SessionUser = Pick<AppUser, "id" | "email" | "name" | "role">;
+type SessionUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: "ADMIN" | "ANALYST" | "VIEWER";
+};
 
 export type AuthenticatedSession = {
   sessionId: string;

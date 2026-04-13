@@ -1,5 +1,3 @@
-import type { AppUser } from "@prisma/client";
-
 import { hashPassword } from "@/lib/auth/password";
 import { prisma } from "@/lib/prisma";
 
@@ -45,7 +43,7 @@ export async function ensureBootstrapUser(overrides?: BootstrapInput) {
   });
 }
 
-export async function upsertBootstrapUser(overrides?: BootstrapInput): Promise<AppUser> {
+export async function upsertBootstrapUser(overrides?: BootstrapInput) {
   const credentials = getBootstrapCredentials(overrides);
   const { salt, hash } = hashPassword(credentials.password);
 

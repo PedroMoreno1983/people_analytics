@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/departments", "/api/analytics"];
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/departments",
+  "/upload",
+  "/api/analytics",
+  "/api/ingestion",
+  "/api/copilot",
+];
 
 function decodeBase64(value: string) {
   try {
@@ -54,5 +61,12 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/departments/:path*", "/api/analytics/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/departments/:path*",
+    "/upload/:path*",
+    "/api/analytics/:path*",
+    "/api/ingestion/:path*",
+    "/api/copilot/:path*",
+  ],
 };

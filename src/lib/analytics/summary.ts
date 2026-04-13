@@ -1,9 +1,58 @@
-import { formatMonthKey, startOfMonth } from "@/lib/analytics/date";
+import type { Prisma } from "@prisma/client";
+
+import {
+  endOfMonth,
+  formatMonthKey,
+  isWithinMonth,
+  startOfMonth,
+} from "@/lib/analytics/date";
 import { getDepartmentHealth } from "@/lib/analytics/health";
-import { riskBand } from "@/lib/analytics/scoring";
+import {
+  normalizeFivePointToPositivePercentage,
+  riskBand,
+} from "@/lib/analytics/scoring";
+import { normalizeSurveyDimension } from "@/lib/analytics/survey";
 import type { ExecutiveSummary } from "@/lib/analytics/types";
 import { prisma } from "@/lib/prisma";
 import { isDemoModeEnabled } from "@/lib/validations/env";
+
+type SummaryFilters = {
+  location?: string;
+  department?: string;
+  age?: string;
+};
+
+type EmployeeRecord = Prisma.EmployeeGetPayload<{
+  include: {
+    department: true;
+    absences: true;
+    riskScores: true;
+    surveyResponses: {
+      include: {
+        survey: true;
+      };
+    };
+  };
+}>;
+
+type MonthlyMetricRecord = Prisma.TeamMetricsMonthlyGetPayload<{
+  include: {
+    department: true;
+  };
+}>;
+
+type SnapshotMetric = {
+  headcount: number;
+  turnoverRate: number;
+  absenteeismRate: number;
+  engagementScore: number;
+  burnoutRiskAvg: number;
+  attritionRiskAvg: number;
+  scores: Array<{
+    attritionRisk: number;
+    burnoutRisk: number;
+  }>;
+};
 
 function average(values: number[]) {
   if (values.length === 0) {
@@ -13,104 +62,355 @@ function average(values: number[]) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+function roundTo(value: number, decimals = 2) {
+  return Number(value.toFixed(decimals));
+}
+
 function percentage(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-function getDemoExecutiveSummary(filters?: { location?: string, department?: string, age?: string }): ExecutiveSummary {
-  // Mock data base
-  let departments = [
-      {
-        departmentId: "d1",
-        name: "Sales",
-        health: "En riesgo",
-        tone: "critical" as const,
-        turnoverRate: 0.08,
-        absenteeismRate: 0.03,
-        engagementScore: 62,
-        burnoutRiskAvg: 49,
-        attritionRiskAvg: 68,
-        headcount: 45,
-      },
-      {
-        departmentId: "d2",
-        name: "Engineering",
-        health: "Saludable",
-        tone: "positive" as const,
-        turnoverRate: 0.02,
-        absenteeismRate: 0.01,
-        engagementScore: 81,
-        burnoutRiskAvg: 28,
-        attritionRiskAvg: 22,
-        headcount: 72,
-      },
-      {
-        departmentId: "d3",
-        name: "Operations",
-        health: "Seguimiento",
-        tone: "warning" as const,
-        turnoverRate: 0.05,
-        absenteeismRate: 0.025,
-        engagementScore: 67,
-        burnoutRiskAvg: 41,
-        attritionRiskAvg: 45,
-        headcount: 38,
-      },
-      {
-        departmentId: "d4",
-        name: "People Ops",
-        health: "Saludable",
-        tone: "positive" as const,
-        turnoverRate: 0.02,
-        absenteeismRate: 0.01,
-        engagementScore: 79,
-        burnoutRiskAvg: 24,
-        attritionRiskAvg: 18,
-        headcount: 22,
-      },
-      {
-        departmentId: "d5",
-        name: "Product",
-        health: "Estable",
-        tone: "positive" as const,
-        turnoverRate: 0.03,
-        absenteeismRate: 0.015,
-        engagementScore: 75,
-        burnoutRiskAvg: 32,
-        attritionRiskAvg: 30,
-        headcount: 31,
-      },
-      {
-        departmentId: "d6",
-        name: "Finance",
-        health: "Seguimiento",
-        tone: "warning" as const,
-        turnoverRate: 0.045,
-        absenteeismRate: 0.02,
-        engagementScore: 69,
-        burnoutRiskAvg: 38,
-        attritionRiskAvg: 41,
-        headcount: 20,
-      },
-      {
-        departmentId: "d7",
-        name: "Marketing",
-        health: "Estable",
-        tone: "positive" as const,
-        turnoverRate: 0.035,
-        absenteeismRate: 0.018,
-        engagementScore: 73,
-        burnoutRiskAvg: 35,
-        attritionRiskAvg: 33,
-        headcount: 20,
-      },
-    ];
+function employeeIsActiveAtMonthEnd(employee: EmployeeRecord, monthEnd: Date) {
+  return (
+    employee.hireDate <= monthEnd &&
+    (!employee.terminationDate || employee.terminationDate > monthEnd)
+  );
+}
 
-  if (filters?.department) {
-    departments = departments.filter(d => d.name === filters.department);
+function employeeIsActiveAtMonthStart(
+  employee: EmployeeRecord,
+  monthStart: Date
+) {
+  return (
+    employee.hireDate < monthStart &&
+    (!employee.terminationDate || employee.terminationDate >= monthStart)
+  );
+}
+
+function employeeExistsDuringMonth(
+  employee: EmployeeRecord,
+  monthStart: Date,
+  monthEnd: Date
+) {
+  return (
+    employee.hireDate <= monthEnd &&
+    (!employee.terminationDate || employee.terminationDate >= monthStart)
+  );
+}
+
+function getLatestSurveyScore(
+  employee: EmployeeRecord,
+  dimension: string,
+  monthEnd: Date
+) {
+  const normalizedDimension = normalizeSurveyDimension(dimension);
+
+  const latestResponse = employee.surveyResponses
+    .filter(
+      (response) =>
+        normalizeSurveyDimension(response.dimension) === normalizedDimension &&
+        response.survey.createdAt <= monthEnd
+    )
+    .sort(
+      (left, right) =>
+        right.survey.createdAt.getTime() - left.survey.createdAt.getTime()
+    )[0];
+
+  return latestResponse?.score;
+}
+
+function matchesFilters(employee: EmployeeRecord, filters?: SummaryFilters) {
+  if (filters?.department && employee.department?.name !== filters.department) {
+    return false;
   }
 
-  const activeHeadcount = departments.reduce((acc, curr) => acc + curr.headcount, 0);
+  if (filters?.location && employee.location !== filters.location) {
+    return false;
+  }
+
+  if (filters?.age && employee.ageBand !== filters.age) {
+    return false;
+  }
+
+  return true;
+}
+
+function getMetricMonths(monthlyMetrics: MonthlyMetricRecord[]) {
+  return Array.from(
+    new Set(
+      monthlyMetrics.map((metric) => startOfMonth(metric.month).getTime())
+    )
+  )
+    .sort((left, right) => left - right)
+    .map((value) => new Date(value));
+}
+
+function buildSnapshotMetric(
+  employees: EmployeeRecord[],
+  monthStart: Date
+): SnapshotMetric {
+  const monthEnd = endOfMonth(monthStart);
+  const activeAtEnd = employees.filter((employee) =>
+    employeeIsActiveAtMonthEnd(employee, monthEnd)
+  );
+  const activeAtStart = employees.filter((employee) =>
+    employeeIsActiveAtMonthStart(employee, monthStart)
+  );
+  const terminationsDuringMonth = employees.filter(
+    (employee) =>
+      employee.terminationDate && isWithinMonth(employee.terminationDate, monthStart)
+  ).length;
+  const absenceDaysDuringMonth = employees
+    .filter((employee) => employeeExistsDuringMonth(employee, monthStart, monthEnd))
+    .flatMap((employee) => employee.absences)
+    .filter((absence) => isWithinMonth(absence.date, monthStart))
+    .reduce((sum, absence) => sum + absence.days, 0);
+  const engagementValues = activeAtEnd.map((employee) =>
+    normalizeFivePointToPositivePercentage(
+      getLatestSurveyScore(employee, "engagement", monthEnd)
+    )
+  );
+  const scores = activeAtEnd
+    .map((employee) =>
+      employee.riskScores.find(
+        (score) => startOfMonth(score.scoringDate).getTime() === monthStart.getTime()
+      )
+    )
+    .filter((score): score is NonNullable<typeof score> => Boolean(score))
+    .map((score) => ({
+      attritionRisk: score.attritionRisk,
+      burnoutRisk: score.burnoutRisk,
+    }));
+
+  return {
+    headcount: activeAtEnd.length,
+    turnoverRate:
+      activeAtStart.length > 0
+        ? roundTo(terminationsDuringMonth / activeAtStart.length, 4)
+        : 0,
+    absenteeismRate:
+      activeAtEnd.length > 0
+        ? roundTo(absenceDaysDuringMonth / (activeAtEnd.length * 22), 4)
+        : 0,
+    engagementScore: roundTo(average(engagementValues)),
+    burnoutRiskAvg: roundTo(average(scores.map((score) => score.burnoutRisk))),
+    attritionRiskAvg: roundTo(
+      average(scores.map((score) => score.attritionRisk))
+    ),
+    scores,
+  };
+}
+
+function buildDepartmentHealth(
+  employees: EmployeeRecord[],
+  latestMonthStart: Date
+): ExecutiveSummary["departmentHealth"] {
+  type DepartmentHealthRow = ExecutiveSummary["departmentHealth"][number];
+  const grouped = new Map<
+    string,
+    {
+      departmentId: string;
+      name: string;
+      employees: EmployeeRecord[];
+    }
+  >();
+
+  for (const employee of employees) {
+    const departmentId = employee.department?.id ?? "unassigned";
+    const departmentName = employee.department?.name ?? "Sin asignar";
+    const current = grouped.get(departmentId);
+
+    if (current) {
+      current.employees.push(employee);
+      continue;
+    }
+
+    grouped.set(departmentId, {
+      departmentId,
+      name: departmentName,
+      employees: [employee],
+    });
+  }
+
+  return Array.from(grouped.values())
+    .map((group) => {
+      const snapshot = buildSnapshotMetric(group.employees, latestMonthStart);
+
+      if (snapshot.headcount === 0 && snapshot.scores.length === 0) {
+        return null;
+      }
+
+      return {
+        departmentId: group.departmentId,
+        name: group.name,
+        ...getDepartmentHealth(snapshot),
+        turnoverRate: snapshot.turnoverRate,
+        absenteeismRate: snapshot.absenteeismRate,
+        engagementScore: snapshot.engagementScore,
+        burnoutRiskAvg: snapshot.burnoutRiskAvg,
+        attritionRiskAvg: snapshot.attritionRiskAvg,
+        headcount: snapshot.headcount,
+      };
+    })
+    .filter((department): department is DepartmentHealthRow => Boolean(department))
+    .sort((left, right) => {
+      const leftSeverity =
+        left.tone === "critical" ? 2 : left.tone === "warning" ? 1 : 0;
+      const rightSeverity =
+        right.tone === "critical" ? 2 : right.tone === "warning" ? 1 : 0;
+
+      if (leftSeverity !== rightSeverity) {
+        return rightSeverity - leftSeverity;
+      }
+
+      return right.attritionRiskAvg - left.attritionRiskAvg;
+    });
+}
+
+function buildInsights(
+  departmentHealth: ExecutiveSummary["departmentHealth"],
+  turnoverTrend: ExecutiveSummary["turnoverTrend"],
+  engagementTrend: ExecutiveSummary["engagementTrend"],
+  burnoutTrend: ExecutiveSummary["burnoutTrend"]
+) {
+  if (departmentHealth.length === 0) {
+    return [
+      "No hay suficientes personas dentro del filtro actual para construir una lectura confiable.",
+    ];
+  }
+
+  const insights: string[] = [];
+  const companyAverageTurnover = average(
+    departmentHealth.map((department) => department.turnoverRate)
+  );
+
+  departmentHealth
+    .filter((department) => department.turnoverRate > companyAverageTurnover * 1.3)
+    .forEach((department) => {
+      insights.push(
+        `La salida está materialmente por encima del promedio del corte en ${department.name}.`
+      );
+    });
+
+  const recentBurnout = burnoutTrend.slice(-3).map((entry) => entry.burnoutRiskAvg);
+  if (
+    recentBurnout.length === 3 &&
+    recentBurnout[0] < recentBurnout[1] &&
+    recentBurnout[1] < recentBurnout[2]
+  ) {
+    insights.push(
+      "Las señales de desgaste vienen subiendo de forma sostenida en los últimos cortes."
+    );
+  }
+
+  const recentEngagement = engagementTrend
+    .slice(-2)
+    .map((entry) => entry.engagementScore);
+  if (
+    recentEngagement.length === 2 &&
+    recentEngagement[0] > recentEngagement[1]
+  ) {
+    insights.push(
+      "El engagement viene cayendo frente al corte anterior y conviene revisar escucha y liderazgo."
+    );
+  }
+
+  const highestRiskDepartment = [...departmentHealth].sort(
+    (left, right) => right.attritionRiskAvg - left.attritionRiskAvg
+  )[0];
+
+  if (highestRiskDepartment && highestRiskDepartment.attritionRiskAvg >= 55) {
+    insights.push(
+      `El riesgo de salida se está concentrando en ${highestRiskDepartment.name}.`
+    );
+  }
+
+  if (insights.length === 0) {
+    insights.push(
+      "No se activaron alertas materiales en este corte. La oportunidad está en sostener lo que hoy funciona."
+    );
+  }
+
+  return insights;
+}
+
+function buildEmptySummary(
+  companyId: string,
+  companyName: string,
+  latestMonth: Date | null,
+  message: string
+): ExecutiveSummary {
+  return {
+    companyId,
+    companyName,
+    latestMonth: latestMonth ? formatMonthKey(latestMonth) : null,
+    kpis: [],
+    departmentHealth: [],
+    attritionDistribution: [],
+    turnoverTrend: [],
+    engagementTrend: [],
+    burnoutTrend: [],
+    insights: [message],
+  };
+}
+
+function getDemoExecutiveSummary(filters?: SummaryFilters): ExecutiveSummary {
+  let departments = [
+    {
+      departmentId: "d1",
+      name: "Ventas",
+      health: "En riesgo",
+      tone: "critical" as const,
+      turnoverRate: 0.08,
+      absenteeismRate: 0.03,
+      engagementScore: 62,
+      burnoutRiskAvg: 49,
+      attritionRiskAvg: 68,
+      headcount: 45,
+    },
+    {
+      departmentId: "d2",
+      name: "Ingeniería",
+      health: "Saludable",
+      tone: "positive" as const,
+      turnoverRate: 0.02,
+      absenteeismRate: 0.01,
+      engagementScore: 81,
+      burnoutRiskAvg: 28,
+      attritionRiskAvg: 22,
+      headcount: 72,
+    },
+    {
+      departmentId: "d3",
+      name: "Operaciones",
+      health: "Seguimiento",
+      tone: "warning" as const,
+      turnoverRate: 0.05,
+      absenteeismRate: 0.025,
+      engagementScore: 67,
+      burnoutRiskAvg: 41,
+      attritionRiskAvg: 45,
+      headcount: 38,
+    },
+    {
+      departmentId: "d4",
+      name: "People Ops",
+      health: "Saludable",
+      tone: "positive" as const,
+      turnoverRate: 0.02,
+      absenteeismRate: 0.01,
+      engagementScore: 79,
+      burnoutRiskAvg: 24,
+      attritionRiskAvg: 18,
+      headcount: 22,
+    },
+  ];
+
+  if (filters?.department) {
+    departments = departments.filter(
+      (department) => department.name === filters.department
+    );
+  }
 
   return {
     companyId: "demo",
@@ -180,15 +480,17 @@ function getDemoExecutiveSummary(filters?: { location?: string, department?: str
       { month: "2026-02", burnoutRiskAvg: 42 },
     ],
     insights: [
-      "La salida está materialmente por encima del promedio de la empresa en Sales.",
+      "La salida está materialmente por encima del promedio de la empresa en Ventas.",
       "El riesgo de desgaste ha subido durante tres períodos consecutivos.",
-      "Engineering es el equipo de referencia en engagement y retención.",
-      "El riesgo de salida está concentrado en Sales.",
+      "Ingeniería es el equipo de referencia en engagement y retención.",
     ],
   };
 }
 
-async function getExecutiveSummaryFromDb(companyId?: string): Promise<ExecutiveSummary | null> {
+async function getExecutiveSummaryFromDb(
+  companyId?: string,
+  filters?: SummaryFilters
+): Promise<ExecutiveSummary | null> {
   const company = companyId
     ? await prisma.company.findUnique({
         where: { id: companyId },
@@ -201,149 +503,116 @@ async function getExecutiveSummaryFromDb(companyId?: string): Promise<ExecutiveS
     return null;
   }
 
-  const monthlyMetrics = await prisma.teamMetricsMonthly.findMany({
-    where: {
-      department: {
-        companyId: company.id,
-      },
-    },
-    include: {
-      department: true,
-    },
-    orderBy: {
-      month: "asc",
-    },
-  });
-
-  if (monthlyMetrics.length === 0) {
-    return {
-      companyId: company.id,
-      companyName: company.name,
-      latestMonth: null,
-      kpis: [],
-      departmentHealth: [],
-      attritionDistribution: [],
-      turnoverTrend: [],
-      engagementTrend: [],
-      burnoutTrend: [],
-      insights: [],
-    };
-  }
-
-  const latestMonth = monthlyMetrics[monthlyMetrics.length - 1]!.month;
-  const latestMonthStart = startOfMonth(latestMonth);
-  const latestEntries = monthlyMetrics.filter(
-    (metric) => metric.month.getTime() === latestMonthStart.getTime(),
-  );
-  const latestScores = await prisma.employeeRiskScore.findMany({
-    where: {
-      employee: {
-        companyId: company.id,
-      },
-      scoringDate: latestMonthStart,
-    },
-    include: {
-      employee: {
-        include: {
-          department: true,
+  const [monthlyMetrics, employees] = await Promise.all([
+    prisma.teamMetricsMonthly.findMany({
+      where: {
+        department: {
+          companyId: company.id,
         },
       },
-    },
-  });
+      include: {
+        department: true,
+      },
+      orderBy: {
+        month: "asc",
+      },
+    }),
+    prisma.employee.findMany({
+      where: {
+        companyId: company.id,
+      },
+      include: {
+        department: true,
+        absences: true,
+        riskScores: true,
+        surveyResponses: {
+          include: {
+            survey: true,
+          },
+        },
+      },
+    }),
+  ]);
 
-  const latestDepartmentHealth = latestEntries.map((entry) => ({
-    departmentId: entry.departmentId,
-    name: entry.department.name,
-    ...getDepartmentHealth(entry),
-    turnoverRate: entry.turnoverRate,
-    absenteeismRate: entry.absenteeismRate,
-    engagementScore: entry.engagementScore,
-    burnoutRiskAvg: entry.burnoutRiskAvg,
-    attritionRiskAvg: entry.attritionRiskAvg,
-    headcount: entry.headcount,
+  const metricMonths = getMetricMonths(monthlyMetrics);
+  const latestMonth = metricMonths.at(-1) ?? null;
+
+  if (metricMonths.length === 0) {
+    return buildEmptySummary(
+      company.id,
+      company.name,
+      latestMonth,
+      "Todavía no hay analytics calculados para esta empresa."
+    );
+  }
+
+  const filteredEmployees = employees.filter((employee) =>
+    matchesFilters(employee, filters)
+  );
+
+  if (filteredEmployees.length === 0) {
+    return buildEmptySummary(
+      company.id,
+      company.name,
+      latestMonth,
+      "No hay personas que coincidan con los filtros actuales."
+    );
+  }
+
+  const trendMetrics = metricMonths.slice(-6).map((month) => ({
+    month,
+    snapshot: buildSnapshotMetric(filteredEmployees, month),
   }));
+  const latestMonthStart = trendMetrics.at(-1)?.month ?? latestMonth;
 
-  const attritionCounts = latestScores.reduce(
+  if (!latestMonthStart) {
+    return buildEmptySummary(
+      company.id,
+      company.name,
+      latestMonth,
+      "No encontramos un corte válido para construir el resumen."
+    );
+  }
+
+  const latestSnapshot = trendMetrics.at(-1)?.snapshot;
+
+  if (!latestSnapshot) {
+    return buildEmptySummary(
+      company.id,
+      company.name,
+      latestMonthStart,
+      "No encontramos métricas suficientes para el último corte."
+    );
+  }
+
+  const departmentHealth = buildDepartmentHealth(filteredEmployees, latestMonthStart);
+  const totalScores = Math.max(latestSnapshot.scores.length, 1);
+  const attritionCounts = latestSnapshot.scores.reduce(
     (counts, score) => {
       const band = riskBand(score.attritionRisk);
       counts[band] += 1;
       return counts;
     },
-    { low: 0, medium: 0, high: 0 },
+    { low: 0, medium: 0, high: 0 }
   );
-  const totalScores = Math.max(latestScores.length, 1);
-
-  const companyMetricsByMonth = Array.from(
-    monthlyMetrics.reduce((map, metric) => {
-      const key = formatMonthKey(metric.month);
-      const current = map.get(key) ?? [];
-      current.push(metric);
-      map.set(key, current);
-      return map;
-    }, new Map<string, typeof monthlyMetrics>()),
-  ).map(([month, metrics]) => ({
-    month,
-    turnoverRate: average(metrics.map((metric) => metric.turnoverRate)),
-    engagementScore: average(metrics.map((metric) => metric.engagementScore)),
-    burnoutRiskAvg: average(metrics.map((metric) => metric.burnoutRiskAvg)),
+  const turnoverTrend = trendMetrics.map(({ month, snapshot }) => ({
+    month: formatMonthKey(month),
+    turnoverRate: snapshot.turnoverRate,
   }));
-
-  const companyAverageTurnover = average(
-    latestEntries.map((entry) => entry.turnoverRate),
+  const engagementTrend = trendMetrics.map(({ month, snapshot }) => ({
+    month: formatMonthKey(month),
+    engagementScore: snapshot.engagementScore,
+  }));
+  const burnoutTrend = trendMetrics.map(({ month, snapshot }) => ({
+    month: formatMonthKey(month),
+    burnoutRiskAvg: snapshot.burnoutRiskAvg,
+  }));
+  const insights = buildInsights(
+    departmentHealth,
+    turnoverTrend,
+    engagementTrend,
+    burnoutTrend
   );
-  const highRiskByDepartment = latestScores.reduce((map, score) => {
-    if (riskBand(score.attritionRisk) !== "high") {
-      return map;
-    }
-
-    const departmentName = score.employee.department?.name ?? "Sin asignar";
-    map.set(departmentName, (map.get(departmentName) ?? 0) + 1);
-    return map;
-  }, new Map<string, number>());
-  const highestConcentration = Array.from(highRiskByDepartment.entries()).sort(
-    (left, right) => right[1] - left[1],
-  )[0];
-  const totalHighRisk = Array.from(highRiskByDepartment.values()).reduce(
-    (sum, value) => sum + value,
-    0,
-  );
-
-  const insights = latestDepartmentHealth
-    .filter((department) => department.turnoverRate > companyAverageTurnover * 1.3)
-    .map(
-      (department) =>
-        `La salida está materialmente por encima del promedio de la empresa en ${department.name}.`,
-    );
-
-  const burnoutTrend = companyMetricsByMonth
-    .slice(-3)
-    .map((entry) => entry.burnoutRiskAvg);
-  if (
-    burnoutTrend.length === 3 &&
-    burnoutTrend[0] < burnoutTrend[1] &&
-    burnoutTrend[1] < burnoutTrend[2]
-  ) {
-    insights.push("El riesgo de desgaste ha subido durante tres períodos consecutivos.");
-  }
-
-  const engagementTrend = companyMetricsByMonth
-    .slice(-2)
-    .map((entry) => entry.engagementScore);
-  if (engagementTrend.length === 2 && engagementTrend[0] > engagementTrend[1]) {
-    insights.push("Engagement is declining across the company.");
-  }
-
-  if (
-    highestConcentration &&
-    totalHighRisk > 0 &&
-    highestConcentration[1] / totalHighRisk > 0.4
-  ) {
-    insights.push(`El riesgo de salida está concentrado en ${highestConcentration[0]}.`);
-  }
-
-  if (insights.length === 0) {
-    insights.push("No se activaron alertas materiales de riesgo de personas en la última ventana de scoring.");
-  }
 
   return {
     companyId: company.id,
@@ -352,53 +621,46 @@ async function getExecutiveSummaryFromDb(companyId?: string): Promise<ExecutiveS
     kpis: [
       {
         label: "Headcount",
-        value: String(
-          latestEntries.reduce((sum, entry) => sum + entry.headcount, 0),
-        ),
+        value: String(latestSnapshot.headcount),
         tone: "positive",
-        detail: "Personas activas en el último mes analizado.",
+        detail: "Personas activas dentro del filtro seleccionado.",
       },
       {
         label: "Turnover",
-        value: percentage(average(latestEntries.map((entry) => entry.turnoverRate))),
+        value: percentage(latestSnapshot.turnoverRate),
         tone:
-          companyAverageTurnover > 0.06
+          latestSnapshot.turnoverRate > 0.06
             ? "critical"
-            : companyAverageTurnover > 0.03
+            : latestSnapshot.turnoverRate > 0.03
               ? "warning"
               : "positive",
-        detail: "Salida promedio por equipo en el último mes analizado.",
+        detail: "Salida real observada en el último corte filtrado.",
       },
       {
         label: "Absenteeism",
-        value: percentage(
-          average(latestEntries.map((entry) => entry.absenteeismRate)),
-        ),
+        value: percentage(latestSnapshot.absenteeismRate),
         tone: "neutral",
-        detail: "Días de ausencia sobre la capacidad laboral del último mes.",
+        detail: "Días de ausencia sobre la capacidad laboral del corte.",
       },
       {
         label: "Engagement",
-        value: `${average(latestEntries.map((entry) => entry.engagementScore)).toFixed(0)}/100`,
-        tone:
-          average(latestEntries.map((entry) => entry.engagementScore)) < 70
-            ? "warning"
-            : "positive",
-        detail: "Último score de engagement según respuestas de encuesta.",
+        value: `${latestSnapshot.engagementScore.toFixed(0)}/100`,
+        tone: latestSnapshot.engagementScore < 70 ? "warning" : "positive",
+        detail: "Lectura de engagement para las personas dentro del filtro.",
       },
       {
         label: "Burnout Risk",
-        value: `${average(latestEntries.map((entry) => entry.burnoutRiskAvg)).toFixed(0)}/100`,
+        value: `${latestSnapshot.burnoutRiskAvg.toFixed(0)}/100`,
         tone:
-          average(latestEntries.map((entry) => entry.burnoutRiskAvg)) > 55
+          latestSnapshot.burnoutRiskAvg > 55
             ? "critical"
-            : average(latestEntries.map((entry) => entry.burnoutRiskAvg)) > 35
+            : latestSnapshot.burnoutRiskAvg > 35
               ? "warning"
               : "positive",
-        detail: "Promedio de riesgo de desgaste según el modelo explicable de Fase 3.",
+        detail: "Promedio de señales de desgaste para este recorte.",
       },
     ],
-    departmentHealth: latestDepartmentHealth,
+    departmentHealth,
     attritionDistribution: [
       {
         label: "Low",
@@ -416,25 +678,19 @@ async function getExecutiveSummaryFromDb(companyId?: string): Promise<ExecutiveS
         tone: "critical",
       },
     ],
-    turnoverTrend: companyMetricsByMonth.slice(-6).map((entry) => ({
-      month: entry.month,
-      turnoverRate: Number(entry.turnoverRate.toFixed(4)),
-    })),
-    engagementTrend: companyMetricsByMonth.slice(-6).map((entry) => ({
-      month: entry.month,
-      engagementScore: Number(entry.engagementScore.toFixed(2)),
-    })),
-    burnoutTrend: companyMetricsByMonth.slice(-6).map((entry) => ({
-      month: entry.month,
-      burnoutRiskAvg: Number(entry.burnoutRiskAvg.toFixed(2)),
-    })),
+    turnoverTrend,
+    engagementTrend,
+    burnoutTrend,
     insights,
   };
 }
 
-export async function getExecutiveSummary(companyId?: string, filters?: { location?: string, department?: string, age?: string }) {
+export async function getExecutiveSummary(
+  companyId?: string,
+  filters?: SummaryFilters
+) {
   try {
-    const summary = await getExecutiveSummaryFromDb(companyId);
+    const summary = await getExecutiveSummaryFromDb(companyId, filters);
 
     if (!summary && isDemoModeEnabled()) {
       return getDemoExecutiveSummary(filters);

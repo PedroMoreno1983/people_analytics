@@ -11,7 +11,7 @@ export type NavigationItem = {
 export const navigationItems: NavigationItem[] = [
   {
     href: "/dashboard",
-    label: "Resumen Ejecutivo",
+    label: "Resumen ejecutivo",
     description: "Qué está pasando hoy, qué cambió y dónde mirar primero.",
     icon: BarChart3,
   },
@@ -23,7 +23,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     href: "/upload",
-    label: "Carga de Datos",
+    label: "Carga de datos",
     description: "Sube archivos, revisa columnas y guarda con contexto.",
     icon: Upload,
   },

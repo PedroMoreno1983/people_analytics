@@ -18,7 +18,7 @@ import { SectionCard } from "@/components/section-card";
 import { Badge } from "@/components/ui/badge";
 import { getExecutiveSummary } from "@/lib/analytics/summary";
 import type { ExecutiveSummary } from "@/lib/analytics/types";
-import { listCompanies } from "@/lib/company";
+import { getCompanyFilterOptions, listCompanies } from "@/lib/company";
 
 export const dynamic = "force-dynamic";
 
@@ -278,7 +278,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
   const searchParams = await props.searchParams;
   const selectedCompanyId =
     typeof searchParams.companyId === "string" ? searchParams.companyId : undefined;
-  
+
   const filters = {
     location: typeof searchParams.location === "string" ? searchParams.location : undefined,
     department: typeof searchParams.department === "string" ? searchParams.department : undefined,
@@ -313,6 +313,59 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
     );
   }
 
+  const filterOptions = await getCompanyFilterOptions(summary.companyId);
+  const hasAppliedFilters = Boolean(
+    filters.location || filters.department || filters.age
+  );
+  const hasSummaryData =
+    summary.kpis.length > 0 && summary.departmentHealth.length > 0;
+  const dashboardBaseHref = summary.companyId
+    ? `/dashboard?companyId=${summary.companyId}`
+    : "/dashboard";
+
+  if (!hasSummaryData) {
+    return (
+      <div className="space-y-6">
+        <GlobalFilters
+          departments={filterOptions.departments}
+          locations={filterOptions.locations}
+          ageBands={filterOptions.ageBands}
+        />
+        <section className="rounded-[34px] border border-slate-200/80 bg-white/90 p-8 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.5)]">
+          <Badge variant="neutral">
+            {hasAppliedFilters ? "Sin resultados" : "Sin lectura disponible"}
+          </Badge>
+          <h1 className="mt-5 font-serif text-4xl font-semibold tracking-tight text-slate-950">
+            {hasAppliedFilters
+              ? "No encontramos personas para este filtro"
+              : `Todavía no hay una lectura lista para ${summary.companyName}`}
+          </h1>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
+            {summary.insights[0] ??
+              "Todavía no hay datos suficientes para construir el resumen ejecutivo."}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href={hasAppliedFilters ? dashboardBaseHref : "/upload"}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium !text-white transition-colors hover:bg-slate-800 hover:!text-white"
+            >
+              {hasAppliedFilters ? "Quitar filtros" : "Cargar datos"}
+              <ArrowRight className="size-4" />
+            </Link>
+            {!hasAppliedFilters && (
+              <Link
+                href="/departments"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-medium !text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:!text-slate-700"
+              >
+                Revisar equipos
+              </Link>
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   const storyCards = buildStoryCards(summary);
   const meetingPrompts = buildMeetingPrompts(summary);
   const kpis = mapKpis(summary);
@@ -332,7 +385,11 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
       )}
 
       {/* Area de Botones Superiores: Filtros Globales */}
-      <GlobalFilters />
+      <GlobalFilters
+        departments={filterOptions.departments}
+        locations={filterOptions.locations}
+        ageBands={filterOptions.ageBands}
+      />
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
         <div className="rounded-[34px] border border-white/70 bg-white/80 p-8 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.18)] backdrop-blur-md">

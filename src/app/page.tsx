@@ -88,6 +88,16 @@ const entryPoints = [
     border: "border-emerald-100",
   },
   {
+    href: "/people",
+    title: "People Explorer",
+    description:
+      "Para bajar a la persona, mirar cobertura, drivers y focos concretos de seguimiento.",
+    icon: Users,
+    accent: "text-fuchsia-700",
+    background: "bg-fuchsia-50",
+    border: "border-fuchsia-100",
+  },
+  {
     href: "/departments",
     title: "Vista por equipos",
     description:

@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Building2, Upload } from "lucide-react";
+import { BarChart3, Building2, Upload, Users2 } from "lucide-react";
 
 export type NavigationItem = {
   href: string;
@@ -14,6 +14,12 @@ export const navigationItems: NavigationItem[] = [
     label: "Resumen ejecutivo",
     description: "Qué está pasando hoy, qué cambió y dónde mirar primero.",
     icon: BarChart3,
+  },
+  {
+    href: "/people",
+    label: "Personas",
+    description: "Cobertura, riesgo individual, drivers y foco de seguimiento.",
+    icon: Users2,
   },
   {
     href: "/departments",

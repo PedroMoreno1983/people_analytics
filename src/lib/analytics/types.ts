@@ -78,3 +78,43 @@ export type DepartmentDashboard = {
   companyName: string;
   departments: DepartmentDashboardEntry[];
 };
+
+export type PeopleDashboardPerson = {
+  employeeId: string;
+  name: string;
+  departmentName: string;
+  managerName: string | null;
+  jobTitle: string | null;
+  location: string | null;
+  workMode: string | null;
+  ageBand: string | null;
+  attritionRisk: number | null;
+  burnoutRisk: number | null;
+  engagementScore: number | null;
+  performanceScore: number | null;
+  absenceDays90: number;
+  topDrivers: string[];
+  tenureLabel: string;
+  latestScoreMonth: string | null;
+  tone: "positive" | "warning" | "critical" | "neutral";
+};
+
+export type PeopleDashboard = {
+  companyId: string;
+  companyName: string;
+  latestMonth: string | null;
+  headcount: number;
+  peopleWithScores: number;
+  teamsRepresented: number;
+  highAttritionCount: number;
+  highBurnoutCount: number;
+  avgEngagementScore: number;
+  riskDistribution: Array<{
+    label: "Low" | "Medium" | "High";
+    value: number;
+    tone: "positive" | "warning" | "critical";
+  }>;
+  insights: string[];
+  spotlight: PeopleDashboardPerson[];
+  people: PeopleDashboardPerson[];
+};

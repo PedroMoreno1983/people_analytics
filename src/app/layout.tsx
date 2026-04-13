@@ -31,6 +31,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               <Link href="/dashboard" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium !text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:!text-indigo-700">
                 Dashboard
               </Link>
+              <Link href="/people" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium !text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:!text-indigo-700">
+                Personas
+              </Link>
               <Link href="/departments" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium !text-slate-700 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:!text-indigo-700">
                 Equipos
               </Link>

@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dev:share": "next dev --hostname 0.0.0.0 --port 3001",
     "build": "node --require ./scripts/next-build-worker-threads.js ./node_modules/next/dist/bin/next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "start:share": "next start --hostname 0.0.0.0 --port 3001",
     "lint": "eslint .",
